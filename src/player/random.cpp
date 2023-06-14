@@ -39,6 +39,7 @@ void read_board(std::ifstream& fin) {
  * @param fout 
  */
 void write_valid_spot(std::ofstream& fout) {
+  //todo?
   // Keep updating the output until getting killed.
   while(true) {
     // Choose a random spot.
