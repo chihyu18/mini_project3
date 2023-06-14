@@ -5,12 +5,15 @@
 #include <cstdlib>
 #include <vector>
 #include <utility>
+//self-added
+#include<set>
+#include<map>
 
 #include "../config.hpp"
 
 
 typedef std::pair<size_t, size_t> Point;
-typedef std::pair<Point, Point> Move;
+typedef std::pair<Point, Point> Move; //from:to?
 class Board{
   public:
     char board[2][BOARD_H][BOARD_W] = {{
@@ -19,8 +22,8 @@ class Board{
       {0, 0, 0, 0, 0},
       {0, 0, 0, 0, 0},
       {0, 0, 0, 0, 0},
-      {1, 1, 1, 1, 1},
-      {2, 3, 4, 5, 6},
+      {1, 1, 1, 1, 1}, //pawns
+      {2, 3, 4, 5, 6}, //castle knight bishop queen king
     }, {
       //black
       {6, 5, 4, 3, 2},
@@ -39,6 +42,12 @@ enum GameState {
   NONE
 };
 
+//self-added
+enum Piece{
+  PAWN=10, ROOK=20, KNIGHT=35, BISHOP=40, QUEEN=100, KING=100000000
+  // PAWN=1, CASTLE, KNIGHT, BISHOP, QUEEN, KING
+};
+
 
 class State{
   public:
@@ -47,12 +56,20 @@ class State{
     Board board;
     int player = 0;
     std::vector<Move> legal_actions;
+    //self-added
+    // std::multiset<std::pair<Piece, Point>> self_pieces, oppn_pieces;
+    std::map<Point, Piece> self_pieces, oppn_pieces;
     
     State(){};
     State(int player): player(player){};
     State(Board board): board(board){};
     State(Board board, int player): board(board), player(player){};
     
+    //slef-added
+    int get_val(int player, int x, int y);
+    int eval_myside();
+    int eval_oppnside();
+
     int evaluate();
     State* next_state(Move move);
     void get_legal_actions();

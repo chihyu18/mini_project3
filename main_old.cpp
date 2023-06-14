@@ -78,15 +78,18 @@ State* State::next_state(Move move){
   int8_t moved = next.board[this->player][from.first][from.second];
   //promotion for pawn
   if(moved == 1 && (to.first==BOARD_H-1 || to.first==0)){
+    //according to the rule that if pawn mmove to the last raw, it becomes queen
     moved = 5;
   }
   if(next.board[1-this->player][to.first][to.second]){
+    //the chess at to is eaten
     next.board[1-this->player][to.first][to.second] = 0;
   }
   
   next.board[this->player][from.first][from.second] = 0;
   next.board[this->player][to.first][to.second] = moved;
   
+  //record this updated state, change the player
   State* next_state = new State(next, 1-this->player);
   
   if(this->game_state != WIN)
@@ -94,7 +97,7 @@ State* State::next_state(Move move){
   return next_state;
 }
 
-
+//可走任意多步的？
 static const int move_table_rook_bishop[8][7][2] = {
   {{0, 1}, {0, 2}, {0, 3}, {0, 4}, {0, 5}, {0, 6}, {0, 7}},
   {{0, -1}, {0, -2}, {0, -3}, {0, -4}, {0, -5}, {0, -6}, {0, -7}},
@@ -105,12 +108,14 @@ static const int move_table_rook_bishop[8][7][2] = {
   {{-1, 1}, {-2, 2}, {-3, 3}, {-4, 4}, {-5, 5}, {-6, 6}, {-7, 7}},
   {{-1, -1}, {-2, -2}, {-3, -3}, {-4, -4}, {-5, -5}, {-6, -6}, {-7, -7}},
 };
+//走日
 static const int move_table_knight[8][2] = {
   {1, 2}, {1, -2},
   {-1, 2}, {-1, -2},
   {2, 1}, {2, -1},
   {-2, 1}, {-2, -1},
 };
+//走九宮格
 static const int move_table_king[8][2] = {
   {1, 0}, {0, 1}, {-1, 0}, {0, -1}, 
   {1, 1}, {1, -1}, {-1, 1}, {-1, -1},
@@ -491,10 +496,10 @@ int main(int argc, char** argv) {
           }
         }
       }
-      if(white_material<black_material){
+      if(white_material>black_material){
         game.player = 1;
         game.game_state = WIN;
-      }else if(white_material>black_material){
+      }else if(white_material<black_material){
         game.player = 0;
         game.game_state = WIN;
       }else{
