@@ -57,6 +57,7 @@ class State{
     int player = 0;
     std::vector<Move> legal_actions;
     //self-added
+    int value;
     // std::multiset<std::pair<Piece, Point>> self_pieces, oppn_pieces;
     std::map<Point, Piece> self_pieces, oppn_pieces;
     

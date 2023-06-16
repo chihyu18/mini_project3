@@ -243,7 +243,7 @@ int State::evaluate(){
 
   int my_val=eval_myside();
   int oppn_val=eval_oppnside();
-  return my_val-oppn_val;
+  return value=my_val-oppn_val;
 }
 
 
@@ -327,7 +327,8 @@ void State::get_legal_actions(){
                 
                 if(p[0]>=BOARD_H || p[0]<0 || p[1]>=BOARD_W || p[1]<0) break;
                 now_piece = self_board[p[0]][p[1]];
-                if(now_piece) break;
+                if(now_piece) break; 
+                //if want to combine the state-value func, maybe here(but it didn't care about whose piece is it)
                 
                 all_actions.push_back(Move(Point(i, j), Point(p[0], p[1])));
                 
