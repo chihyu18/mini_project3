@@ -13,6 +13,8 @@
  * 
  * @return int 
  */
+
+//self-added
 int State::get_val(int player, int x, int y){
   //get val of the piece on the board
   switch(board.board[!player][x][y]){
@@ -46,6 +48,8 @@ State* State::next_state(Move move){
     next.board[1-this->player][to.first][to.second] = 0;
   }
   
+  //self-added for test
+  // std::swap(next.board[this->player][from.first][from.second], next.board[this->player][to.first][to.second]);
   next.board[this->player][from.first][from.second] = 0;
   next.board[this->player][to.first][to.second] = moved;
   
@@ -58,12 +62,12 @@ State* State::next_state(Move move){
 
 
 static const int move_table_rook_bishop[8][7][2] = {
-  //rook: 0~3
+  //rook: 0!3
   {{0, 1}, {0, 2}, {0, 3}, {0, 4}, {0, 5}, {0, 6}, {0, 7}},
   {{0, -1}, {0, -2}, {0, -3}, {0, -4}, {0, -5}, {0, -6}, {0, -7}},
   {{1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 0}, {7, 0}},
   {{-1, 0}, {-2, 0}, {-3, 0}, {-4, 0}, {-5, 0}, {-6, 0}, {-7, 0}},
-  //bishop: 4~7
+  //bishop: 4!7
   {{1, 1}, {2, 2}, {3, 3}, {4, 4}, {5, 5}, {6, 6}, {7, 7}},
   {{1, -1}, {2, -2}, {3, -3}, {4, -4}, {5, -5}, {6, -6}, {7, -7}},
   {{-1, 1}, {-2, 2}, {-3, 3}, {-4, 4}, {-5, 5}, {-6, 6}, {-7, 7}},
@@ -80,8 +84,9 @@ static const int move_table_king[8][2] = {
   {1, 1}, {1, -1}, {-1, 1}, {-1, -1},
 };
 
-int State::eval_myside(){
-  auto self_board=board.board[player], oppn_board=board.board[!player];
+
+int State::eval(int p){
+  auto self_board=board.board[p], oppn_board=board.board[!p];
   int value=0;
   int now_piece;
   int nx, ny, walkable=0, k;
@@ -89,15 +94,15 @@ int State::eval_myside(){
     for(int j=0;j<BOARD_W;++j){
       switch(now_piece=self_board[i][j]){
         case 1: //pawn-10
-          if(!player && i>0){ //white
+          if(!p && i>0){ //white
             if(!self_board[i-1][j] && !oppn_board[i-1][j]) value+=10;
-            if(j>0 && oppn_board[i-1][j-1]) value+=get_val(~player, i-1, j-1);
-            if(j<BOARD_W-1 && oppn_board[i-1][j+1]) value+=get_val(~player, i-1, j+1);
+            if(j>0 && oppn_board[i-1][j-1]) value+=get_val(!p, i-1, j-1);
+            if(j<BOARD_W-1 && oppn_board[i-1][j+1]) value+=get_val(!p, i-1, j+1);
           }
-          else if(player && i<BOARD_H-1){ //black
+          else if(p && i<BOARD_H-1){ //black
             if(!self_board[i+1][j] && !oppn_board[i+1][j]) value+=10;
-            if(j>0 && oppn_board[i+1][j-1]) value+=get_val(~player, i+1, j-1);
-            if(j<BOARD_W-1 && oppn_board[i+1][j+1]) value+=get_val(~player, i+1, j+1);
+            if(j>0 && oppn_board[i+1][j-1]) value+=get_val(!p, i+1, j-1);
+            if(j<BOARD_W-1 && oppn_board[i+1][j+1]) value+=get_val(!p, i+1, j+1);
           }
           break;
         case 2: //rook-20
@@ -118,7 +123,7 @@ int State::eval_myside(){
               ny=j+move_table_rook_bishop[path][k][1];
               if(nx<0 || nx>=BOARD_H || ny<0 || ny>=BOARD_W) break;
               if(self_board[nx][ny]) break;
-              if(oppn_board[nx][ny]) value+=get_val(~player, nx, ny);
+              if(oppn_board[nx][ny]) value+=get_val(!p, nx, ny);
             }
             value+=val*k;
           }
@@ -130,7 +135,7 @@ int State::eval_myside(){
             ny=j+move_table_knight[k][1];
             if(nx<0 || nx>=BOARD_H || ny<0 || ny>=BOARD_W) continue;
             if(self_board[nx][ny]) continue;
-            if(oppn_board[nx][ny]) value+=get_val(~player, nx, ny);
+            if(oppn_board[nx][ny]) value+=get_val(!p, nx, ny);
             walkable++;
           }
           value+=35*walkable;
@@ -143,7 +148,7 @@ int State::eval_myside(){
             ny=j+move_table_king[k][1];
             if(nx<0 || nx>=BOARD_H || ny<0 || ny>=BOARD_W) continue;
             if(self_board[nx][ny]) continue;
-            if(oppn_board[nx][ny]) value+=get_val(~player, nx, ny);
+            if(oppn_board[nx][ny]) value+=get_val(!p, nx, ny);
           }
           value+=INF;
           break;
@@ -152,81 +157,7 @@ int State::eval_myside(){
       }
     }
   }
-  return 0;
-}
-int State::eval_oppnside(){
-  auto self_board=board.board[!player], oppn_board=board.board[player];
-  int value=0;
-  int now_piece;
-  int nx, ny, walkable=0, k;
-  for(int i=0;i<BOARD_H;++i){
-    for(int j=0;j<BOARD_W;++j){
-      
-      switch(now_piece=self_board[i][j]){
-        case 1: //pawn-10
-          if(!player && i>0){ //white
-            if(!self_board[i-1][j] && !oppn_board[i-1][j]) value+=10;
-            if(j>0 && oppn_board[i-1][j-1]) value+=get_val(~player, i-1, j-1);
-            if(j<BOARD_W-1 && oppn_board[i-1][j+1]) value+=get_val(~player, i-1, j+1);
-          }
-          else if(player && i<BOARD_H-1){ //black
-            if(!self_board[i+1][j] && !oppn_board[i+1][j]) value+=10;
-            if(j>0 && oppn_board[i+1][j-1]) value+=get_val(~player, i+1, j-1);
-            if(j<BOARD_W-1 && oppn_board[i+1][j+1]) value+=get_val(~player, i+1, j+1);
-          }
-          break;
-        case 2: //rook-20
-        case 4: //bishop-40
-        case 5: //queen-100
-          int st, end, val;
-          switch(now_piece){
-            case 2: st=0; end=4; val=20; break; //rook
-            case 4: st=4; end=8; val=40; break; //bishop
-            case 5: st=0; end=8; val=100; break; //queen
-            default: st=0; end=-1;
-          }
-          for(int path=st;path<end;++path){
-            // int nx, ny, k;
-            for(k=0;k<7;++k){
-              nx=i+move_table_rook_bishop[path][k][0];
-              ny=j+move_table_rook_bishop[path][k][1];
-              if(nx<0 || nx>=BOARD_H || ny<0 || ny>=BOARD_W) break;
-              if(self_board[nx][ny]) break;
-              if(oppn_board[nx][ny]) value+=get_val(~player, nx, ny);
-            }
-            value+=val*k;
-          }
-          break;
-        case 3: //knight-35
-          // int nx, ny, k, walkable=0;
-          for(k=0;k<8;++k){
-            nx=i+move_table_knight[k][0];
-            ny=j+move_table_knight[k][1];
-            if(nx<0 || nx>=BOARD_H || ny<0 || ny>=BOARD_W) continue;
-            if(self_board[nx][ny]) continue;
-            if(oppn_board[nx][ny]) value+=get_val(~player, nx, ny);
-            walkable++;
-          }
-          value+=35*walkable;
-          break;
-        case 6: //king-INF
-        //maybe i need to consider check...
-          // int nx, ny;
-          for(k=0;k<8;++k){
-            nx=i+move_table_king[k][0];
-            ny=j+move_table_king[k][1];
-            if(nx<0 || nx>=BOARD_H || ny<0 || ny>=BOARD_W) continue;
-            if(self_board[nx][ny]) continue;
-            if(oppn_board[nx][ny]) value+=get_val(~player, nx, ny);
-          }
-          value+=INF;
-          break;
-        default:
-          break;
-      }
-    }
-  }
-  return 0;
+  return value;
 }
 
 int State::evaluate(){
@@ -241,8 +172,8 @@ int State::evaluate(){
   */
  //optimize: maybe use a map to record the pos of pieces?
 
-  int my_val=eval_myside();
-  int oppn_val=eval_oppnside();
+  int my_val=eval(player);
+  int oppn_val=eval(!player);
   return value=my_val-oppn_val;
 }
 

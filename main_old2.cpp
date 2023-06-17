@@ -463,8 +463,6 @@ int main(int argc, char** argv) {
       log << x_axis[action.first.second] << y_axis[action.first.first] << " → " \
           << x_axis[action.second.second] << y_axis[action.second.first] << "\n";
       log << data;
-      game.player = !game.player;
-      game.game_state = WIN;
       break;
     }else{
       temp = game.next_state(action);

@@ -13,7 +13,7 @@
 
 
 typedef std::pair<size_t, size_t> Point;
-typedef std::pair<Point, Point> Move; //from:to?
+typedef std::pair<Point, Point> Move; //from:to
 class Board{
   public:
     char board[2][BOARD_H][BOARD_W] = {{
@@ -68,8 +68,7 @@ class State{
     
     //slef-added
     int get_val(int player, int x, int y);
-    int eval_myside();
-    int eval_oppnside();
+    int eval(int p);
 
     int evaluate();
     State* next_state(Move move);
