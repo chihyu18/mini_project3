@@ -17,7 +17,7 @@
 //self-added
 int State::get_val(int player, int x, int y){
   //get val of the piece on the board
-  switch(board.board[!player][x][y]){
+  switch(board.board[player][x][y]){
     case 1: return 10;
     case 2: return 20;
     case 3: return 35;
@@ -62,12 +62,12 @@ State* State::next_state(Move move){
 
 
 static const int move_table_rook_bishop[8][7][2] = {
-  //rook: 0!3
+  //rook: 0:3
   {{0, 1}, {0, 2}, {0, 3}, {0, 4}, {0, 5}, {0, 6}, {0, 7}},
   {{0, -1}, {0, -2}, {0, -3}, {0, -4}, {0, -5}, {0, -6}, {0, -7}},
   {{1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 0}, {7, 0}},
   {{-1, 0}, {-2, 0}, {-3, 0}, {-4, 0}, {-5, 0}, {-6, 0}, {-7, 0}},
-  //bishop: 4!7
+  //bishop: 4:7
   {{1, 1}, {2, 2}, {3, 3}, {4, 4}, {5, 5}, {6, 6}, {7, 7}},
   {{1, -1}, {2, -2}, {3, -3}, {4, -4}, {5, -5}, {6, -6}, {7, -7}},
   {{-1, 1}, {-2, 2}, {-3, 3}, {-4, 4}, {-5, 5}, {-6, 6}, {-7, 7}},
