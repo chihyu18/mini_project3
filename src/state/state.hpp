@@ -6,6 +6,7 @@
 #include <vector>
 #include <utility>
 //self-added
+#include<climits>
 #include<set>
 #include<map>
 
@@ -58,6 +59,8 @@ class State{
     std::vector<Move> legal_actions;
     //self-added
     int value;
+    int alpha=INT_MIN; //record the max; player choose alpha?
+    int beta=INT_MAX; //record the min; oppn choose beta?
     // std::multiset<std::pair<Piece, Point>> self_pieces, oppn_pieces;
     std::map<Point, Piece> self_pieces, oppn_pieces;
     
@@ -67,6 +70,7 @@ class State{
     State(Board board, int player): board(board), player(player){};
     
     //slef-added
+    State(Board board, int player, int a, int b): board(board), player(player), alpha(a), beta(b){};
     int get_val(int player, int x, int y);
     int eval(int p);
 

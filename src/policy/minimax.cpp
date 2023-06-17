@@ -55,7 +55,7 @@ int minimax(State *state, int depth, int p, int d){
 	//but since we pass in out "oppn", the return value is opposite
 	if(d==depth) return state->evaluate();
 
-	if(state->legal_actions.empty()) state->get_legal_actions();
+	// if(state->legal_actions.empty()) state->get_legal_actions();
 	auto actions=state->legal_actions;
 	int min=INT_MAX, max=0;
 	for(auto& act:actions){

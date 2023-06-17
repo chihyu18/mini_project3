@@ -3,7 +3,7 @@
 
 #include "../config.hpp"
 #include "../state/state.hpp"
-#include "../policy/minimax.hpp"
+#include "../policy/alphabeta.hpp"
 
 
 State* root;
@@ -38,14 +38,15 @@ void read_board(std::ifstream& fin) {
  * 
  * @param fout 
  */
-void write_valid_spot(std::ofstream& fout) { 
+void write_valid_spot(std::ofstream& fout) {
   //todo?
   // Keep updating the output until getting killed.
-  while(true) { //root->game_state==UNKNOWN || root->game_state==NONE
+  while(true) {
     // Choose a random spot.
-    auto move = Minimax::get_move(root, 3); //天啊跑4層就超久
+    auto move = Alphabeta::get_move(root, 0);
     fout << move.first.first << " " << move.first.second << " "\
-         << move.second.first << " " << move.second.second << std::endl;  
+         << move.second.first << " " << move.second.second << std::endl;
+    
     // Remember to flush the output to ensure the last action is written to file.
     fout.flush();
     break;
