@@ -59,8 +59,8 @@ class State{
     std::vector<Move> legal_actions;
     //self-added
     int value;
-    int alpha=INT_MIN; //record the max; player choose alpha?
-    int beta=INT_MAX; //record the min; oppn choose beta?
+    int alpha=INT_MIN; //the max the player can get
+    int beta=INT_MAX; //the min the oppn can get
     // std::multiset<std::pair<Piece, Point>> self_pieces, oppn_pieces;
     std::map<Point, Piece> self_pieces, oppn_pieces;
     
