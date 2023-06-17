@@ -34,12 +34,10 @@ Move Minimax::get_move(State *state, int depth){
 		// State next=*state;
 		State next=State(state->board, state->player);//found that there is no copy constructor
 		Board& b=next.board;
-		if(b.board[state->player][act.second.first][act.second.second]){ //take piece
-			b.board[state->player][act.second.first][act.second.second]=b.board[state->player][act.first.first][act.first.second];
-			b.board[state->player][act.first.first][act.first.second]=0;
+		if(b.board[!state->player][act.second.first][act.second.second]){ //take piece
+			b.board[!state->player][act.second.first][act.second.second]=0;
 		}
-		else
-			std::swap(b.board[state->player][act.first.first][act.first.second], b.board[state->player][act.second.first][act.second.second]);
+		std::swap(b.board[state->player][act.first.first][act.first.second], b.board[state->player][act.second.first][act.second.second]);
 		next.legal_actions.clear();
 		next.get_legal_actions();
 		minimax(&next, depth, !state->player, 0);
@@ -66,12 +64,10 @@ int minimax(State *state, int depth, int p, int d){
 	for(auto& act:actions){
 		State next=State(state->board, state->player);
 		Board& b=next.board;
-		if(b.board[p][act.second.first][act.second.second]){
-			b.board[p][act.second.first][act.second.second]=b.board[p][act.first.first][act.first.second];
-			b.board[p][act.first.first][act.first.second]=0;
+		if(b.board[!p][act.second.first][act.second.second]){
+			b.board[p][act.second.first][act.second.second]=0;
 		}
-		else
-			std::swap(b.board[p][act.first.first][act.first.second], b.board[p][act.second.first][act.second.second]);
+		std::swap(b.board[p][act.first.first][act.first.second], b.board[p][act.second.first][act.second.second]);
 		next.get_legal_actions();
 		if(p==state->player){//oppn decide
 			min=std::min(min, minimax(&next, depth, !p, d+1));

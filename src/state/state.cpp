@@ -18,11 +18,11 @@
 int State::get_val(int player, int x, int y){
   //get val of the piece on the board
   switch(board.board[player][x][y]){
-    case 1: return 10;
-    case 2: return 20;
-    case 3: return 35;
-    case 4: return 40;
-    case 5: return 100;
+    case 1: return 2;
+    case 2: return 6;
+    case 3: return 7;
+    case 4: return 8;
+    case 5: return 20;
     case 6: return INF;
     default: return 0;
   }
@@ -89,7 +89,7 @@ int State::eval(int p){
   //to improve: maybe consider king's safety
   //improved: don't consider the potential of taking material!! since that's the next round's business:(
   auto self_board=board.board[p], oppn_board=board.board[!p];
-  int material_val=0, movability_val=0;
+  int material_val=0, movability_val=0, check_val=0;
   int value=0;
   int now_piece;
   int nx, ny, walkable=0, k;
@@ -104,7 +104,8 @@ int State::eval(int p){
               walkable++;
             }
             if(j>0 && oppn_board[i-1][j-1]) walkable++;
-            if(j<BOARD_W-1 && oppn_board[i-1][j+1]) walkable++;;
+            if(j<BOARD_W-1 && oppn_board[i-1][j+1]==6) {check_val++; walkable++;}
+            else if(j<BOARD_W-1 && oppn_board[i-1][j+1]) walkable++;;
           }
           else if(p && i<BOARD_H-1){ //black
             if(!self_board[i+1][j] && !oppn_board[i+1][j]){
@@ -112,7 +113,8 @@ int State::eval(int p){
               walkable++;
             }
             if(j>0 && oppn_board[i+1][j-1]) walkable++;
-            if(j<BOARD_W-1 && oppn_board[i+1][j+1]) walkable++;
+            if(j<BOARD_W-1 && oppn_board[i+1][j+1]==6) {check_val++; walkable++;}
+            else if(j<BOARD_W-1 && oppn_board[i+1][j+1]) walkable++;
           }
           movability_val+=walkable;
           break;
@@ -132,7 +134,7 @@ int State::eval(int p){
               ny=j+move_table_rook_bishop[path][k][1];
               if(nx<0 || nx>=BOARD_H || ny<0 || ny>=BOARD_W) break;
               if(self_board[nx][ny]) break;
-              // if(oppn_board[nx][ny]) value+=get_val(!p, nx, ny);
+              if(oppn_board[nx][ny]==6) check_val++;
             }
             walkable+=k;
           }
@@ -146,7 +148,7 @@ int State::eval(int p){
             ny=j+move_table_knight[k][1];
             if(nx<0 || nx>=BOARD_H || ny<0 || ny>=BOARD_W) continue;
             if(self_board[nx][ny]) continue;
-            // if(oppn_board[nx][ny]) value+=get_val(!p, nx, ny);
+            if(oppn_board[nx][ny]==6) check_val++;
             walkable++;
           }
           material_val+=35;
@@ -160,7 +162,7 @@ int State::eval(int p){
             ny=j+move_table_king[k][1];
             if(nx<0 || nx>=BOARD_H || ny<0 || ny>=BOARD_W) continue;
             if(self_board[nx][ny]) continue;
-            // if(oppn_board[nx][ny]) value+=get_val(!p, nx, ny);
+            if(oppn_board[nx][ny]==6) check_val++;
             walkable++;
           }
           material_val+=INF;
@@ -171,7 +173,7 @@ int State::eval(int p){
       }
     }
   }
-  value=material_val*5+movability_val*3;
+  value=material_val*5+movability_val*3+check_val*3;
   return value;
 }
 

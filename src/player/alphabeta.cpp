@@ -43,7 +43,7 @@ void write_valid_spot(std::ofstream& fout) {
   // Keep updating the output until getting killed.
   while(true) {
     // Choose a random spot.
-    auto move = Alphabeta::get_move(root, 4); //真的有變快ㄟ好感動喔嗚嗚
+    auto move = Alphabeta::get_move(root, 5); //真的有變快ㄟ好感動喔嗚嗚
     fout << move.first.first << " " << move.first.second << " "\
          << move.second.first << " " << move.second.second << std::endl;
     
