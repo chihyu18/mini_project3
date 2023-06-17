@@ -86,7 +86,8 @@ static const int move_table_king[8][2] = {
 
 int State::eval(int p){
   //improved: should let the effect of taking piece bigger than the walkable paths...
-  //improved: maybe consider king's safety
+  //to improve: maybe consider king's safety
+  //improved: don't consider the potential of taking material!! since that's the next round's business:(
   auto self_board=board.board[p], oppn_board=board.board[!p];
   int material_val=0, movability_val=0;
   int value=0;
