@@ -92,6 +92,7 @@ int State::eval(int p){
   int nx, ny, walkable=0, k;
   for(int i=0;i<BOARD_H;++i){
     for(int j=0;j<BOARD_W;++j){
+      walkable=0;
       switch(now_piece=self_board[i][j]){
         case 1: //pawn-10
           if(!p && i>0){ //white

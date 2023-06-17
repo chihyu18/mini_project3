@@ -33,7 +33,12 @@ Move Alphabeta::get_move(State *state, int depth){
   for(auto& act:actions){
     State next=State(state->board, state->player, state->alpha, state->beta);
     auto& b=next.board.board;
-    std::swap(b[state->player][act.first.first][act.first.second], b[state->player][act.second.first][act.second.second]);
+    if(b[state->player][act.second.first][act.second.second]){
+      b[state->player][act.second.first][act.second.second]=b[state->player][act.first.first][act.first.second];
+      b[state->player][act.first.first][act.first.second]=0;
+    }
+    else
+      std::swap(b[state->player][act.first.first][act.first.second], b[state->player][act.second.first][act.second.second]);
     next.get_legal_actions();
     alphabeta(&next, depth, !state->player, 0);
 		if(next.value>max){
@@ -56,7 +61,12 @@ int alphabeta(State *state, int depth, int p, int d){
     for(auto& act:actions){
         State next=State(state->board, state->player, state->alpha, state->beta);
         auto& b=next.board.board;
-        std::swap(b[p][act.first.first][act.first.second], b[p][act.second.first][act.second.second]);
+        if(b[p][act.second.first][act.second.second]){
+          b[p][act.second.first][act.second.second]=b[p][act.first.first][act.first.second];
+          b[p][act.first.first][act.first.second]=0;
+        }
+        else
+          std::swap(b[p][act.first.first][act.first.second], b[p][act.second.first][act.second.second]);
         next.get_legal_actions();
         if(p==state->player){
             // min=std::min(min, alphabeta(&next, depth, !p, d+1));
