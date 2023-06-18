@@ -92,6 +92,7 @@ public:
   State game_state; //if win: value=1, lose: value=2, draw: value=0.5
   Move act; //for preventing repeatedly?
   Node(){};
+  // Node(Node& n):parent(n.parent), children(n.children), Q(n.Q), N(n.N), game_state(n.game_state){};
   Node(State& s):game_state(s){};
   bool all_expanded(){
     for(auto& c:children){

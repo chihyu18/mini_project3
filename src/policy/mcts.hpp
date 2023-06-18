@@ -7,6 +7,7 @@
  * your policy class should have get_move method
  */
 class MCTS{
+  // friend class Random;
 public:
   static Move get_move(State *state, int depth);
 

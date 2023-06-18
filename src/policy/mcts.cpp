@@ -18,7 +18,11 @@ selection: if(not_all_expand) expand, else BestChild()
 expansion: randomly choose a *unwalked* node and add it to tree
 simulation: play the game by *random* policy
 backpropagate: return the reward(value?), and update Q and N
+
+build tree is for propagating to the root?
 */
+
+const int material_table[7] = {0, 2, 6, 7, 8, 20, 100};
 
 /**
  * @brief Randomly get a legal action
@@ -55,7 +59,7 @@ Node MCTS::MCts(Node* root){
 		reward=DefaultPolicy(&select_node); //simulate
 		BackUp(&select_node, reward); //backup all the passed nodes
 	}
-
+	return BestChild(root, false);
 }
 
 Node MCTS::TreePolicy(Node* node){
@@ -98,6 +102,7 @@ Node MCTS::Expand(Node* node){
 		walked_states.insert(c.game_state);
 	}*/
 	int c=10;
+	srand(20);
 	Node select_node=childrens[(rand()*c)%childrens.size()];
 	while(select_node.N) select_node=childrens[(rand()*(++c))%childrens.size()];
 	select_node.parent=node;
@@ -109,9 +114,43 @@ int MCTS::DefaultPolicy(Node* node){
 	State cur_state=node->game_state;
 	int player=cur_state.player;
 	int reward=0;
+
+	//to check if draw:
+	int step=0;
+	int max_step=50;
+
 	while(cur_state.game_state==NONE || cur_state.game_state==UNKNOWN){
-		auto move=get_move(&cur_state, 0);
+		auto actions=cur_state.legal_actions;
+		srand(10);
+		auto move=actions[rand()%actions.size()];
 		cur_state=*(cur_state.next_state(move));
+		step++;
+	
+		if(step>max_step){
+			int white_material = 0;
+      int black_material = 0;
+      int piece;
+			State game=cur_state;
+			for(size_t i=0; i<BOARD_H; i+=1){
+        for(size_t j=0; j<BOARD_W; j+=1){
+          if((piece=game.board.board[0][i][j])){
+            white_material += material_table[piece];
+          }
+          if((piece=game.board.board[1][i][j])){
+            black_material += material_table[piece];
+          }
+        }
+      }
+      if(white_material<black_material){
+        game.player = 1;
+        game.game_state = WIN;
+      }else if(white_material>black_material){
+        game.player = 0;
+        game.game_state = WIN;
+      }else{
+        game.game_state = DRAW;
+      }
+		}
 	}
 	if(cur_state.game_state==DRAW) reward=0.5;
 	else if(cur_state.game_state==WIN && cur_state.player!=player) reward=-1; //lose...?
