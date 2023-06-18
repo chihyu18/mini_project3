@@ -72,6 +72,7 @@ class State{
     
     //self-added
     State(Board board, int player, int a, int b): board(board), player(player), alpha(a), beta(b){};
+    // State(State& s): board(s.board), player(s.player), alpha(s.alpha), beta(s.beta), game_state(s.game_state){};
     int get_val(int player, int x, int y);
     int eval(int p);
 
@@ -86,12 +87,18 @@ class State{
 class Node{
 public:
   Node *parent=nullptr;
-  std::vector<Node*> children; 
-  int Q, N; //for UCB
+  std::vector<Node> children; 
+  int Q=0, N=0; //for UCB
   State game_state; //if win: value=1, lose: value=2, draw: value=0.5
   Move act; //for preventing repeatedly?
   Node(){};
   Node(State& s):game_state(s){};
+  bool all_expanded(){
+    for(auto& c:children){
+      if(c.N==0) return false;
+    }
+    return true;
+  }
 };
 
 #endif

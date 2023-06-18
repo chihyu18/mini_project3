@@ -31,19 +31,14 @@ Move Minimax::get_move(State *state, int depth){
 	int max=INT_MIN;
 	Move ans=actions[0];
 	for(auto& act:actions){		
-		// State next=*state;
-		State next=State(state->board, state->player);//found that there is no copy constructor
-		Board& b=next.board;
-		if(b.board[!state->player][act.second.first][act.second.second]){ //take piece
-			b.board[!state->player][act.second.first][act.second.second]=0;
-		}
-		std::swap(b.board[state->player][act.first.first][act.first.second], b.board[state->player][act.second.first][act.second.second]);
-		next.legal_actions.clear();
-		next.get_legal_actions();
-		minimax(&next, depth, !state->player, 0);
+
+		State *next;
+		next=state->next_state(act);
+
+		minimax(next, depth, state->player, 0);
 		// next.evaluate();
-		if(next.value>max){
-			max=next.value;
+		if(next->value>max){
+			max=next->value;
 			ans=act;
 		}
 		// max=std::max(max, minimax(&next, depth, !state->player, 0)); //next level would be oppn...?
@@ -58,25 +53,20 @@ int minimax(State *state, int depth, int p, int d){
 	//but since we pass in out "oppn", the return value is opposite
 	if(d==depth) return state->evaluate();
 
-	// if(state->legal_actions.empty()) state->get_legal_actions();
 	auto actions=state->legal_actions;
 	int min=INT_MAX, max=0;
 	for(auto& act:actions){
-		State next=State(state->board, state->player);
-		Board& b=next.board;
-		if(b.board[!p][act.second.first][act.second.second]){
-			b.board[p][act.second.first][act.second.second]=0;
-		}
-		std::swap(b.board[p][act.first.first][act.first.second], b.board[p][act.second.first][act.second.second]);
-		next.get_legal_actions();
-		if(p==state->player){//oppn decide
-			min=std::min(min, minimax(&next, depth, !p, d+1));
+		State *next;
+		next=state->next_state(act);
+
+		if(state->player!=p){//oppn decide
+			min=std::min(min, minimax(next, depth, !p, d+1));
 		}
 		else{//me decide
-			max=std::max(max, minimax(&next, depth, !p, d+1));
+			max=std::max(max, minimax(next, depth, !p, d+1));
 		}
 		// minimax(&next, depth, !p, d+1);
 	}
-	if(p==state->player) return state->value=min; //oppn decide
+	if(p!=state->player) return state->value=min; //oppn decide
 	return state->value=max; //me decide
 }

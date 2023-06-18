@@ -30,17 +30,15 @@ Move Alphabeta::get_move(State *state, int depth){
   state->beta=INT_MAX;
   int max=INT_MIN;
   Move ans=actions[0];
-  for(auto& act:actions){
-    State next=State(state->board, state->player, state->alpha, state->beta);
-    auto& b=next.board.board;
-    if(b[!state->player][act.second.first][act.second.second]){
-      b[!state->player][act.second.first][act.second.second]=0;
-    }
-std::swap(b[state->player][act.first.first][act.first.second], b[state->player][act.second.first][act.second.second]);
-    next.get_legal_actions();
-    alphabeta(&next, depth, !state->player, 0);
-		if(next.value>max){
-			max=next.value;
+  for(auto& act:actions){  
+
+    State* next=state->next_state(act);
+    next->alpha=state->alpha;
+    next->beta=state->beta;
+
+    alphabeta(next, depth, state->player, 0);
+		if(next->value>max){
+			max=next->value;
 			ans=act;
 		}
   }
@@ -55,18 +53,15 @@ int alphabeta(State *state, int depth, int p, int d){
     if(d==depth) return state->evaluate();
 
     auto actions=state->legal_actions;
-    if(p==state->player){ //oppn
+    if(state->player!=p){ //oppn
       int min=INT_MAX;
       for(auto& act:actions){
-        State next=State(state->board, state->player, state->alpha, state->beta);
-        auto& b=next.board.board;
-        if(b[!p][act.second.first][act.second.second]){
-          b[!p][act.second.first][act.second.second]=0;
-        }
-        std::swap(b[p][act.first.first][act.first.second], b[p][act.second.first][act.second.second]);
 
-        next.get_legal_actions();
-        min=state->beta=std::min(state->beta, alphabeta(&next, depth, !p, d+1));
+        State* next=state->next_state(act);
+        next->alpha=state->alpha;
+        next->beta=state->beta;
+
+        min=state->beta=std::min(state->beta, alphabeta(next, depth, p, d+1));
         if(state->alpha>=state->beta) break;
       }
       return state->value=min;
@@ -74,15 +69,12 @@ int alphabeta(State *state, int depth, int p, int d){
     else{ //me
       int max=INT_MIN;
       for(auto& act:actions){
-        State next=State(state->board, state->player, state->alpha, state->beta);
-        auto& b=next.board.board;
-        if(b[!p][act.second.first][act.second.second]){
-          b[!p][act.second.first][act.second.second]=0;
-        }
-        std::swap(b[p][act.first.first][act.first.second], b[p][act.second.first][act.second.second]);
 
-        next.get_legal_actions();
-        max=state->alpha=std::max(state->alpha, alphabeta(&next, depth, !p, d+1));
+        State* next=state->next_state(act);
+        next->alpha=state->alpha;
+        next->beta=state->beta;
+
+        max=state->alpha=std::max(state->alpha, alphabeta(next, depth, p, d+1));
         if(state->alpha>=state->beta) break;
       }
       return state->value=max;
