@@ -3,6 +3,7 @@
 #include<cmath>
 #include<climits>
 #include<set>
+#include<ctime>
 
 #include "../state/state.hpp"
 #include "./mcts.hpp"
@@ -35,12 +36,15 @@ Move MCTS::get_move(State *state, int depth){
   if(!state->legal_actions.size())
     state->get_legal_actions();
 
+	srand(time(0));
+
 	Node best_subnode;
 	Node root=Node(*state);
 	root.N=1;
 	/*auto actions=state->legal_actions;
 	for(auto act:actions){
 		Node child=Node(*state);
+		child.N=1;
 		child.act=act;
 		child.parent=&root;
 		child.game_state=*(child.game_state.next_state(act)); //be careful?
@@ -48,13 +52,15 @@ Move MCTS::get_move(State *state, int depth){
 	}*/
 	best_subnode=MCts(&root);
 
-  return best_subnode.act;
+	// auto tmp=root.game_state.legal_actions;
+  return best_subnode.act; //tmp[rand()%tmp.size()]
 }
 
 Node MCTS::MCts(Node* root){
 	int computation_budge=1000; //limit the times of searching
 	Node select_node;
 	int reward=0;
+	srand(time(0));
   for(int i=0;i<computation_budge;++i){
 		select_node=TreePolicy(root); //select
 		reward=DefaultPolicy(&select_node); //simulate
@@ -81,13 +87,14 @@ Node MCTS::BestChild(Node* node, bool is_explore){
 
 	Node best_node;
 	auto& children=node->children;
-	int max=INT_MIN, C;
+	int max=INT_MIN;
+	double C;
 	if(is_explore) C=1/sqrt(2);
-	else C=0; //reduce the UCB of explored node(smaller priority)
+	else C=0.0; //reduce the UCB of explored node(smaller priority)
 	
 	for(auto& child:children){
-		int left=child.Q/child.N;
-		int right=C*sqrt(2*log(node->N)/child.N);
+		double left=child.Q/child.N;
+		double right=C*sqrt(2*log(node->N)/child.N);
 		if(left+right>max){
 			max=left+right;
 			best_node=child;
@@ -97,19 +104,25 @@ Node MCTS::BestChild(Node* node, bool is_explore){
 }
 Node MCTS::Expand(Node* node){
 	//randomly choose one action that haven't chosed
-	int c=10;
-	srand(20);
 	std::set<Move> walked_actions;
+	std::vector<Move> unwalked_actions;
 	for(auto& c:node->children) walked_actions.insert(c.act);
-	
 	auto actions=node->game_state.legal_actions;
-	Move select_act=actions[(rand()*c)%actions.size()];
-	while(walked_actions.find(select_act)!=walked_actions.end())
-		select_act=actions[(rand()*c)%actions.size()];
+	for(auto& act:actions){
+		if(walked_actions.find(act)==walked_actions.end()) 
+			unwalked_actions.push_back(act);
+	}
+	
+	Move select_act=unwalked_actions[rand()%unwalked_actions.size()];
+	// while(walked_actions.find(select_act)!=walked_actions.end())
+	// 	select_act=actions[rand()%actions.size()];
 
 	State* next_state=node->game_state.next_state(select_act);
 	Node select_node=Node(*next_state);
+	select_node.act=select_act;
 	select_node.parent=node;
+	node->children.push_back(select_node);
+	delete(next_state);
 	return select_node;
 }
 
@@ -125,7 +138,7 @@ int MCTS::DefaultPolicy(Node* node){
 
 	while(cur_state.game_state==NONE || cur_state.game_state==UNKNOWN){
 		auto actions=cur_state.legal_actions;
-		srand(10);
+		
 		auto move=actions[rand()%actions.size()];
 		cur_state=*(cur_state.next_state(move));
 		step++;
@@ -134,7 +147,7 @@ int MCTS::DefaultPolicy(Node* node){
 			int white_material = 0;
       int black_material = 0;
       int piece;
-			State game=cur_state;
+			State &game=cur_state;
 			for(size_t i=0; i<BOARD_H; i+=1){
         for(size_t j=0; j<BOARD_W; j+=1){
           if((piece=game.board.board[0][i][j])){
