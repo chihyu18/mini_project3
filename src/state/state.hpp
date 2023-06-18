@@ -61,6 +61,7 @@ class State{
     int value;
     int alpha=INT_MIN; //the max the player can get
     int beta=INT_MAX; //the min the oppn can get
+
     // std::multiset<std::pair<Piece, Point>> self_pieces, oppn_pieces;
     std::map<Point, Piece> self_pieces, oppn_pieces;
     
@@ -69,7 +70,7 @@ class State{
     State(Board board): board(board){};
     State(Board board, int player): board(board), player(player){};
     
-    //slef-added
+    //self-added
     State(Board board, int player, int a, int b): board(board), player(player), alpha(a), beta(b){};
     int get_val(int player, int x, int y);
     int eval(int p);
@@ -79,6 +80,18 @@ class State{
     void get_legal_actions();
     std::string encode_output();
     std::string encode_state();
+};
+
+//self-added for mcts
+class Node{
+public:
+  Node *parent=nullptr;
+  std::vector<Node*> children; 
+  int Q, N; //for UCB
+  State game_state; //if win: value=1, lose: value=2, draw: value=0.5
+  Move act; //for preventing repeatedly?
+  Node(){};
+  Node(State& s):game_state(s){};
 };
 
 #endif
