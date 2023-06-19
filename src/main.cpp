@@ -476,9 +476,6 @@ int main(int argc, char** argv) {
           << x_axis[action.second.second] << y_axis[action.second.first] << "\n";
     }
     game = *temp;
-    
-    //self-added
-    
 
     step += 1;
     if(step>MAX_STEP){

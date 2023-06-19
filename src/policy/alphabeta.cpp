@@ -29,14 +29,16 @@ Move Alphabeta::get_move(State *state, int depth){
   state->alpha=INT_MIN;
   state->beta=INT_MAX;
   int max=INT_MIN;
+
   Move ans=actions[0];
   for(auto& act:actions){  
 
     State* next=state->next_state(act);
+    // next->alpha=state->alpha;
     // next->alpha=INT_MIN;
     // next->beta=INT_MAX;
-
-    state->alpha=alphabeta(next, depth, state->player, 0);
+    alphabeta(next, depth, state->player, 0);
+    // state->alpha=std::max(state->alpha, alphabeta(next, depth, state->player, 0));
 		if(next->value>max){
 			max=next->value;
 			ans=act;
@@ -50,7 +52,7 @@ int alphabeta(State *state, int depth, int p, int d){
     //since oppn must choose the min, but the last level(player) will choose the max, hence any smaller than that min is unnecessary
     //so for player, those alpha>=beta are redundant; while for oppn, those beta<=alpha are redundant
     //OMG the conditions are the same!!!
-    if(d==depth || state->game_state==WIN || state->legal_actions.empty()) 
+    if(d==depth) 
       return state->evaluate(p);
 
     state->get_legal_actions();

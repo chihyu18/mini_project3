@@ -44,10 +44,82 @@ enum GameState {
 };
 
 //self-added
-enum Piece{
-  PAWN=10, ROOK=20, KNIGHT=35, BISHOP=40, QUEEN=100, KING=100000000
-  // PAWN=1, CASTLE, KNIGHT, BISHOP, QUEEN, KING
+//reference:https://www.chessprogramming.org/Simplified_Evaluation_Function
+const int pawn_Square_Table[2][5][5]={
+  {
+    {0,   0,   0,   0,   0},      
+    {5,  10,  10,  10,   5},
+    {5,   5,  10,  10,   5},
+    {5,   5,   5,   5,   5},
+    {0,   0,   0,   0,   0}
+  }, 
+  {
+    {0,   0,   0,   0,   0},
+    {5,   5,   5,   5,   5}, 
+    {5,   5,  10,  10,   5},
+    {5,  10,  10,  10,   5},
+    {0,   0,   0,   0,   0}    
+  }
 };
+
+const int knight_Square_Table[5][5]={
+  {0,   0,   0,   0,   0},
+  {0,   5,   5,   5,   0},
+  {0,   5,  10,   5,   0},
+  {0,   5,   5,   5,   0},
+  {0,   0,   0,   0,   0}
+};
+
+const int bishop_Square_Table[5][5]={
+  {0,   0,   0,   0,   0},
+  {0,  10,   5,  10,   0},
+  {0,   5,  10,   5,   0},
+  {0,  10,   5,  10,   0},
+  {0,   0,   0,   0,    0}
+};
+
+const int rook_Square_Table[5][5]={
+  {0,   0,   5,   5,   0},
+  {0,   0,   5,   5,   0},
+  {0,   0,   5,   5,   0},
+  {0,   0,   5,   5,   0},
+  {0,   0,   5,   5,   0}
+};
+
+const int queen_Square_Table[5][5]={
+  {0,   0,   5,   0,   0},
+  {0,   5,   5,   5,   0},
+  {5,   5,  10,   5,   5},
+  {0,   5,   5,   5,   0},
+  {0,   0,   5,   0,   0}
+};
+
+const int king_Square_Table1[2][5][5]={
+  {
+    {0,   0,   0,   0,   0},
+    {0,   0,   0,   0,   0},
+    {0,   0,   0,   0,   0},
+    {0,   0,   0,   0,   0},
+    {0,   5,   0,   5,   0}
+  },
+  {
+    {0,   5,   0,   5,   0},
+    {0,   0,   0,   0,   0},
+    {0,   0,   0,   0,   0},
+    {0,   0,   0,   0,   0},
+    {0,   0,   0,   0,   0}
+  }
+  
+};
+
+const int king_Square_Table2[5][5]={
+  {0,   0,   0,   0,   0},
+  {0,   5,   5,   5,   0},
+  {0,   5,  10,   5,   0},
+  {0,   5,   5,   5,   0},
+  {0,   0,   0,   0,   0}
+};
+
 
 
 class State{
@@ -64,7 +136,7 @@ class State{
     int step=0; //record how many steps have been walked
 
     // std::multiset<std::pair<Piece, Point>> self_pieces, oppn_pieces;
-    std::map<Point, Piece> self_pieces, oppn_pieces;
+    // std::map<Point, Piece> self_pieces, oppn_pieces;
     
     State(){};
     State(int player): player(player){};
@@ -105,3 +177,54 @@ public:
 };
 
 #endif
+
+/*just for backup:D
+// Pawn
+    {
+        {0,   0,   0,   0,   0},
+        {5,   5,   5,   5,   5},
+        {5,  10,  10,  10,   5},
+        {5,   5,  10,  10,   5},
+        {0,   0,   0,   0,   0}
+    },
+    // Rook
+    {
+        {0,   0,   5,   5,   0},
+        {0,   0,   5,   5,   0},
+        {0,   0,   5,   5,   0},
+        {0,   0,   5,   5,   0},
+        {0,   0,   5,   5,   0}
+    },
+    // Bishop
+    {
+        {0,   0,   0,   0,   0},
+        {0,  10,   5,  10,   0},
+        {0,   5,  10,   5,   0},
+        {0,  10,   5,  10,   0},
+        {0,   0,   0,   0,    0}
+    },
+    // Queen
+    {
+        {0,   0,   5,   0,   0},
+        {0,   5,   5,   5,   0},
+        {5,   5,  10,   5,   5},
+        {0,   5,   5,   5,   0},
+        {0,   0,   5,   0,   0}
+    },
+    // Knight
+    {
+        {0,   0,   0,   0,   0},
+        {0,   5,   5,   5,   0},
+        {0,   5,  10,   5,   0},
+        {0,   5,   5,   5,   0},
+        {0,   0,   0,   0,   0}
+    },
+    // King
+    {
+        {0,   0,   0,   0,   0},
+        {0,   5,   5,   5,   0},
+        {0,   5,  10,   5,   0},
+        {0,   5,   5,   5,   0},
+        {0,   0,   0,   0,   0}
+    }
+*/
