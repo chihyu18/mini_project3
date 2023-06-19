@@ -76,7 +76,7 @@ class State{
     int get_val(int player, int x, int y);
     int eval(int p);
 
-    int evaluate();
+    int evaluate(int p);
     State* next_state(Move move);
     void get_legal_actions();
     std::string encode_output();

@@ -166,18 +166,19 @@ int State::eval(int p){
             walkable++;
           }
           material_val+=INF;
-          movability_val+=walkable;
+          movability_val+=walkable; //we don't want too many open path for king...?
           break;
         default:
           break;
       }
     }
   }
-  value=material_val*5+movability_val*3+check_val*3;
+  if(game_state==WIN && player!=p) return -1; //the worst senario!!
+  value=material_val*5+movability_val*3+check_val*3; //+movability_val*3+check_val*3
   return value;
 }
 
-int State::evaluate(){
+int State::evaluate(int p){ //eval from p's perspective
   // [TODO] design your own evaluation function
   /*
   evaluate the present state?
@@ -189,8 +190,8 @@ int State::evaluate(){
   */
  //optimize: maybe use a map to record the pos of pieces?
 
-  int my_val=eval(player);
-  int oppn_val=eval(!player);
+  int my_val=eval(p);
+  int oppn_val=eval(!p);
   return value=my_val-oppn_val;
 }
 

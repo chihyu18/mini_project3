@@ -41,8 +41,8 @@ Move MCTS::get_move(State *state, int depth){
 	Node best_subnode;
 	Node *root=new Node(*state);
 	root->N=1;
-	auto actions=state->legal_actions;
-	/*for(auto act:actions){
+	/*auto actions=state->legal_actions;
+	for(auto act:actions){
 		Node child=Node(*state);
 		// child.N=1;
 		child.act=act;
@@ -50,7 +50,7 @@ Move MCTS::get_move(State *state, int depth){
 		child.game_state=*(child.game_state.next_state(act)); //be careful?
 		root.children.push_back(child);
 	}*/
-	// best_subnode=MCts(root);
+	best_subnode=MCts(root);
 
 	auto tmp=root->game_state.legal_actions;
   return tmp[rand()%tmp.size()]; //best_subnode.act; //tmp[rand()%tmp.size()];
@@ -104,20 +104,16 @@ Node MCTS::BestChild(Node* node, bool is_explore){
 			best_node=child;
 		}
 	}
+	best_node.act=children[0].game_state.legal_actions[0];
 	return best_node;
 }
 Node MCTS::Expand(Node* node){
 	//randomly choose one action that haven't chosed
-	/*std::vector<Node> unwalked_nodes;
-	auto children=node->children;
-	for(auto& child:children){
-		if(child.N==0) unwalked_nodes.push_back(child);
-	}
-	Node select_node=unwalked_nodes[rand()%unwalked_nodes.size()];*/
+
 	Move select_act;
 	auto actions=node->game_state.legal_actions;
 
-	if(!node->children.empty()){
+	/*if(!node->children.empty()){
 		std::set<Move> walked_actions;
 		std::vector<Move> unwalked_actions;
 		for(auto& c:node->children) walked_actions.insert(c.act);
@@ -132,10 +128,8 @@ Node MCTS::Expand(Node* node){
 		select_act=unwalked_actions[rand()%unwalked_actions.size()];
 
 	}
-	else select_act=actions[rand()%actions.size()];
-	
-	// while(walked_actions.find(select_act)!=walked_actions.end())
-	// 	select_act=actions[rand()%actions.size()];
+	else select_act=actions[rand()%actions.size()];*/
+	select_act=actions[0];
 
 	State* next_state=node->game_state.next_state(select_act);
 	Node select_node=Node(*next_state);
