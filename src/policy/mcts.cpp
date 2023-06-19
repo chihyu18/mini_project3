@@ -25,6 +25,13 @@ build tree is for propagating to the root?
 
 const int material_table[7] = {0, 2, 6, 7, 8, 20, 100};
 
+Node MCts(Node* root);
+double get_UCB(Node* node);
+Node selection(Node* node);
+Node Expansion(Node* node);
+int roll_out(Node* node, int p, int cnt);
+void backup(Node* node, int reward);
+
 /**
  * @brief Randomly get a legal action
  * 
@@ -56,7 +63,125 @@ Move MCTS::get_move(State *state, int depth){
   return tmp[rand()%tmp.size()]; //best_subnode.act; //tmp[rand()%tmp.size()];
 }
 
-Node MCTS::MCts(Node* root){
+Node MCts(Node* root){
+	Node select_node=selection(root);
+	Node expand_node=Expansion(&select_node);
+	auto& children=select_node.children;
+	auto child=children[rand()%children.size()];
+	int p=root->game_state.player;
+	int reward=roll_out(&child, p, root->game_state.step);
+	backup(&child, reward);
+	return selection(root);
+}
+
+double get_UCB(Node* node){
+	double C=sqrt(1/2);
+	double left=node->Q/node->N;
+	double right=C*sqrt(2*log(node->parent->N)/node->N+1);
+	return left+right;
+}
+
+Node selection(Node* node){
+	Node select_node;
+	int max=INT_MIN;
+	double tmp;
+	auto& children=node->children;
+	for(auto& child:children){
+		if(tmp=get_UCB(&child)>max){
+			select_node=child;
+			max=tmp;
+		}
+	}
+	return select_node;
+}
+
+Node Expansion(Node* node){
+	//keep looking for node to expand(should be leaf!), and choose by UCB
+	if(node->children.empty()){
+		if(!node->game_state.legal_actions.empty()){
+			auto& actions=node->game_state.legal_actions;
+			for(auto& act:actions){
+				State* next_state=node->game_state.next_state(act);
+				Node child=Node(*next_state);
+				child.parent=node;
+				child.act=act;
+				node->children.push_back(child);
+			}
+		}
+		return *node;
+	}
+	auto& children=node->children;
+	int max=INT_MIN;
+	double tmp;
+	Node select_node;
+	for(auto& child:children){
+		if(tmp=get_UCB(&child)>max){
+			select_node=child;
+			max=tmp;
+		}
+	}
+	return Expansion(&select_node);
+}
+
+int roll_out(Node* node, int p, int cnt){
+
+	if(cnt>MAX_STEP){
+		int white_material = 0;
+      int black_material = 0;
+      int piece;
+		State &game=node->game_state;
+		for(size_t i=0; i<BOARD_H; i+=1){
+			for(size_t j=0; j<BOARD_W; j+=1){
+				if((piece=game.board.board[0][i][j])){
+					white_material += material_table[piece];
+				}
+				if((piece=game.board.board[1][i][j])){
+					black_material += material_table[piece];
+				}
+			}
+		}
+		if(white_material<black_material){
+			game.player = 1;
+			game.game_state = WIN;
+		}else if(white_material>black_material){
+			game.player = 0;
+			game.game_state = WIN;
+		}else{
+			game.game_state = DRAW;
+		}
+	}
+	if(node->game_state.game_state==WIN && node->game_state.player==p) return 2;
+	if(node->game_state.game_state==WIN) return -2;
+	if(node->game_state.game_state==DRAW) return 1;
+
+	
+	node->game_state.get_legal_actions();
+	auto& actions=node->game_state.legal_actions;
+	Move simulate_act=actions[rand()%actions.size()];
+	State* next_state=node->game_state.next_state(simulate_act);
+	Node simulate_node=Node(*next_state);
+	
+	/*node->game_state.get_legal_actions();
+	auto& actions=node->game_state.legal_actions;
+	for(auto& act:actions){
+		State* next_state=node->game_state.next_state(act);
+		Node child=Node(*next_state);
+		node->children.push_back(child);
+	}
+	Node simulate_node=node->children[rand()%node->children.size()];*/
+
+	return roll_out(&simulate_node, p, cnt+1);
+}
+
+void backup(Node* node, int reward){
+	while(node!=nullptr){
+		node->Q+=reward;
+		node->N++;
+		node=node->parent;
+	}
+}
+
+/*Node MCTS::MCts(Node* root){
 	int computation_budget=1000; //limit the times of searching
 	Node select_node;
 	int reward=0;
@@ -98,13 +223,13 @@ Node MCTS::BestChild(Node* node, bool is_explore){
 	
 	for(auto& child:children){
 		double left=child.Q/child.N;
-		double right=C*sqrt(2*log(node->N)/child.N);
+		double right=C*sqrt(2*log(node->N+1e-6)/child.N+1e-9);
 		if(left+right>max){
 			max=left+right;
 			best_node=child;
 		}
 	}
-	best_node.act=children[0].game_state.legal_actions[0];
+	// best_node.act=children[0].game_state.legal_actions[0];
 	return best_node;
 }
 Node MCTS::Expand(Node* node){
@@ -113,7 +238,7 @@ Node MCTS::Expand(Node* node){
 	Move select_act;
 	auto actions=node->game_state.legal_actions;
 
-	/*if(!node->children.empty()){
+	if(!node->children.empty()){
 		std::set<Move> walked_actions;
 		std::vector<Move> unwalked_actions;
 		for(auto& c:node->children) walked_actions.insert(c.act);
@@ -128,8 +253,7 @@ Node MCTS::Expand(Node* node){
 		select_act=unwalked_actions[rand()%unwalked_actions.size()];
 
 	}
-	else select_act=actions[rand()%actions.size()];*/
-	select_act=actions[0];
+	else select_act=actions[rand()%actions.size()];
 
 	State* next_state=node->game_state.next_state(select_act);
 	Node select_node=Node(*next_state);
@@ -195,4 +319,4 @@ void MCTS::BackUp(Node* node, int reward){
 		node->Q+=reward;
 		node=node->parent;
 	}
-}
+}*/

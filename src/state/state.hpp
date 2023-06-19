@@ -24,7 +24,7 @@ class Board{
       {0, 0, 0, 0, 0},
       {0, 0, 0, 0, 0},
       {1, 1, 1, 1, 1}, //pawns
-      {2, 3, 4, 5, 6}, //castle knight bishop queen king
+      {2, 3, 4, 5, 6}, //rook knight bishop queen king
     }, {
       //black
       {6, 5, 4, 3, 2},
@@ -61,6 +61,7 @@ class State{
     int value;
     int alpha=INT_MIN; //the max the player can get
     int beta=INT_MAX; //the min the oppn can get
+    int step=0; //record how many steps have been walked
 
     // std::multiset<std::pair<Piece, Point>> self_pieces, oppn_pieces;
     std::map<Point, Piece> self_pieces, oppn_pieces;
@@ -73,7 +74,6 @@ class State{
     //self-added
     State(Board board, int player, int a, int b): board(board), player(player), alpha(a), beta(b){};
     // State(State& s): board(s.board), player(s.player), alpha(s.alpha), beta(s.beta), game_state(s.game_state){};
-    int get_val(int player, int x, int y);
     int eval(int p);
 
     int evaluate(int p);

@@ -1,0 +1,1 @@
+getmove 0

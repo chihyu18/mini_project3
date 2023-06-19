@@ -6,7 +6,7 @@
 #include "../config.hpp"
 
 //self-added
-#define INF 10000;
+#define INF 1000;
 
 /**
  * @brief evaluate the state
@@ -15,19 +15,7 @@
  */
 
 //self-added
-int State::get_val(int player, int x, int y){
-  //get val of the piece on the board
-  switch(board.board[player][x][y]){
-    case 1: return 2;
-    case 2: return 6;
-    case 3: return 7;
-    case 4: return 8;
-    case 5: return 20;
-    case 6: return INF;
-    default: return 0;
-  }
-}
-
+int piece_val[7]={0, 10, 30, 40, 50, 100, 10000};
 
 /**
  * @brief return next state after the move
@@ -88,6 +76,9 @@ int State::eval(int p){
   //improved: should let the effect of taking piece bigger than the walkable paths...
   //to improve: maybe consider king's safety
   //improved: don't consider the potential of taking material!! since that's the next round's business:(
+
+  if(game_state==WIN && player!=p) return -1; //the worst senario!!(因為在get_legal_actions的時候就會判斷WIN了，所以這樣可以?)
+
   auto self_board=board.board[p], oppn_board=board.board[!p];
   int material_val=0, movability_val=0, check_val=0;
   int value=0;
@@ -100,7 +91,7 @@ int State::eval(int p){
         case 1: //pawn-10
           if(!p && i>0){ //white
             if(!self_board[i-1][j] && !oppn_board[i-1][j]){
-              material_val+=10;
+              material_val+=piece_val[1];
               walkable++;
             }
             if(j>0 && oppn_board[i-1][j-1]) walkable++;
@@ -109,7 +100,7 @@ int State::eval(int p){
           }
           else if(p && i<BOARD_H-1){ //black
             if(!self_board[i+1][j] && !oppn_board[i+1][j]){
-              material_val+=10;
+              material_val+=piece_val[1];
               walkable++;
             }
             if(j>0 && oppn_board[i+1][j-1]) walkable++;
@@ -118,14 +109,14 @@ int State::eval(int p){
           }
           movability_val+=walkable;
           break;
-        case 2: //rook-20
+        case 2: //rook-30
         case 4: //bishop-40
         case 5: //queen-100
           int st, end, val;
           switch(now_piece){
-            case 2: st=0; end=4; val=20; break; //rook
-            case 4: st=4; end=8; val=40; break; //bishop
-            case 5: st=0; end=8; val=100; break; //queen
+            case 2: st=0; end=4; val=piece_val[2]; break; //rook
+            case 4: st=4; end=8; val=piece_val[4]; break; //bishop
+            case 5: st=0; end=8; val=piece_val[5]; break; //queen
             default: st=0; end=-1;
           }
           for(int path=st;path<end;++path){
@@ -151,7 +142,7 @@ int State::eval(int p){
             if(oppn_board[nx][ny]==6) check_val++;
             walkable++;
           }
-          material_val+=35;
+          material_val+=piece_val[3];
           movability_val+=walkable;
           break;
         case 6: //king-INF
@@ -165,7 +156,7 @@ int State::eval(int p){
             if(oppn_board[nx][ny]==6) check_val++;
             walkable++;
           }
-          material_val+=INF;
+          material_val+=piece_val[6];
           movability_val+=walkable; //we don't want too many open path for king...?
           break;
         default:
@@ -173,8 +164,8 @@ int State::eval(int p){
       }
     }
   }
-  if(game_state==WIN && player!=p) return -1; //the worst senario!!
-  value=material_val*10+movability_val*100+check_val*1000; //+movability_val*3+check_val*3
+  
+  value=material_val*10+check_val*1000+movability_val*100; //挖這可能真的是最好的權重了 改了會invalid action是怎樣？？？
   return value;
 }
 
