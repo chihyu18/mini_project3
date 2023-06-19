@@ -43,7 +43,7 @@ void write_valid_spot(std::ofstream& fout) {
   // Keep updating the output until getting killed.
   while(true) { //root->game_state==UNKNOWN || root->game_state==NONE
     // Choose a random spot.
-    auto move = Minimax::get_move(root, 3); //天啊跑4層就超久
+    auto move = Minimax::get_move(root, 4); //超過四層就出事...
     fout << move.first.first << " " << move.first.second << " "\
          << move.second.first << " " << move.second.second << std::endl;  
     // Remember to flush the output to ensure the last action is written to file.

@@ -6,7 +6,7 @@
 #include "../config.hpp"
 
 //self-added
-#define INF 1e6;
+#define INF 10000;
 
 /**
  * @brief evaluate the state
@@ -174,7 +174,7 @@ int State::eval(int p){
     }
   }
   if(game_state==WIN && player!=p) return -1; //the worst senario!!
-  value=material_val*5+movability_val*3+check_val*3; //+movability_val*3+check_val*3
+  value=material_val*10+movability_val*100+check_val*1000; //+movability_val*3+check_val*3
   return value;
 }
 
