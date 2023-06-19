@@ -39,54 +39,58 @@ Move MCTS::get_move(State *state, int depth){
 	srand(time(0));
 
 	Node best_subnode;
-	Node root=Node(*state);
-	root.N=1;
-	/*auto actions=state->legal_actions;
-	for(auto act:actions){
+	Node *root=new Node(*state);
+	root->N=1;
+	auto actions=state->legal_actions;
+	/*for(auto act:actions){
 		Node child=Node(*state);
-		child.N=1;
+		// child.N=1;
 		child.act=act;
 		child.parent=&root;
 		child.game_state=*(child.game_state.next_state(act)); //be careful?
 		root.children.push_back(child);
 	}*/
-	best_subnode=MCts(&root);
+	// best_subnode=MCts(root);
 
-	// auto tmp=root.game_state.legal_actions;
-  return best_subnode.act; //tmp[rand()%tmp.size()]
+	auto tmp=root->game_state.legal_actions;
+  return tmp[rand()%tmp.size()]; //best_subnode.act; //tmp[rand()%tmp.size()];
 }
 
 Node MCTS::MCts(Node* root){
-	int computation_budge=1000; //limit the times of searching
+	int computation_budget=1000; //limit the times of searching
 	Node select_node;
 	int reward=0;
 	srand(time(0));
-  for(int i=0;i<computation_budge;++i){
+  for(int i=0;i<computation_budget;++i){
 		select_node=TreePolicy(root); //select
 		reward=DefaultPolicy(&select_node); //simulate
 		BackUp(&select_node, reward); //backup all the passed nodes
 	}
-	return BestChild(root, false);
+	Node best_subnode=BestChild(root, false);
+	return best_subnode;
 }
 
 Node MCTS::TreePolicy(Node* node){
-	Node select_node;
-	while(node->game_state.game_state==UNKNOWN || node->game_state.game_state==NONE){
-		if(node->all_expanded()){
-			select_node=BestChild(node, true); //exploitation...
-		}	
-		else	
-			return Expand(node); //exploration...
+	Node* cur_node=node;
+	Node expand_node;
+	while(cur_node->game_state.game_state==UNKNOWN || cur_node->game_state.game_state==NONE){
+		if(cur_node->all_expanded()){
+			*cur_node=BestChild(cur_node, true);
+		}
+		else{
+			expand_node=Expand(cur_node);
+			return expand_node;
+		}		
 	}
-	return select_node;
+	return *cur_node;
 }
 
 Node MCTS::BestChild(Node* node, bool is_explore){
 	//UCB: Q/N + C*sqrt(2*ln(N(parent))/N(child))
 	//select priority: explored or not -> UCB
 
-	Node best_node;
 	auto& children=node->children;
+	Node best_node=children[0];
 	int max=INT_MIN;
 	double C;
 	if(is_explore) C=1/sqrt(2);
@@ -104,16 +108,32 @@ Node MCTS::BestChild(Node* node, bool is_explore){
 }
 Node MCTS::Expand(Node* node){
 	//randomly choose one action that haven't chosed
-	std::set<Move> walked_actions;
-	std::vector<Move> unwalked_actions;
-	for(auto& c:node->children) walked_actions.insert(c.act);
-	auto actions=node->game_state.legal_actions;
-	for(auto& act:actions){
-		if(walked_actions.find(act)==walked_actions.end()) 
-			unwalked_actions.push_back(act);
+	/*std::vector<Node> unwalked_nodes;
+	auto children=node->children;
+	for(auto& child:children){
+		if(child.N==0) unwalked_nodes.push_back(child);
 	}
+	Node select_node=unwalked_nodes[rand()%unwalked_nodes.size()];*/
+	Move select_act;
+	auto actions=node->game_state.legal_actions;
+
+	if(!node->children.empty()){
+		std::set<Move> walked_actions;
+		std::vector<Move> unwalked_actions;
+		for(auto& c:node->children) walked_actions.insert(c.act);
+		// if(node->game_state.legal_actions.empty())
+		// node->game_state.get_legal_actions();
+		
+		for(auto& act:actions){
+			if(walked_actions.find(act)==walked_actions.end()) 
+				unwalked_actions.push_back(act);
+		}
+
+		select_act=unwalked_actions[rand()%unwalked_actions.size()];
+
+	}
+	else select_act=actions[rand()%actions.size()];
 	
-	Move select_act=unwalked_actions[rand()%unwalked_actions.size()];
 	// while(walked_actions.find(select_act)!=walked_actions.end())
 	// 	select_act=actions[rand()%actions.size()];
 
@@ -147,8 +167,8 @@ int MCTS::DefaultPolicy(Node* node){
 			int white_material = 0;
       int black_material = 0;
       int piece;
-			State &game=cur_state;
-			for(size_t i=0; i<BOARD_H; i+=1){
+		State &game=cur_state;
+		for(size_t i=0; i<BOARD_H; i+=1){
         for(size_t j=0; j<BOARD_W; j+=1){
           if((piece=game.board.board[0][i][j])){
             white_material += material_table[piece];

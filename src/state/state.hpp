@@ -88,7 +88,7 @@ class Node{
 public:
   Node *parent=nullptr;
   std::vector<Node> children; //存走過的node?
-  int Q=0, N=1; //for UCB
+  int Q=0, N=0; //for UCB
   State game_state; //if win: value=1, lose: value=2, draw: value=0.5
   Move act; //for preventing repeatedly?
   Node(){};
@@ -97,10 +97,10 @@ public:
   bool all_expanded(){
     if(children.size()==game_state.legal_actions.size()) return true;
     return false;
-    /*for(auto& c:children){
-      if(c.N==0) return false;
-    }
-    return true;*/
+    // for(auto& c:children){
+    //   if(c.N==0) return false;
+    // }
+    // return true;
   }
 };
 
