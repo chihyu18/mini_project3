@@ -477,6 +477,9 @@ int main(int argc, char** argv) {
     }
     game = *temp;
     
+    //self-added
+    
+
     step += 1;
     if(step>MAX_STEP){
       int white_material = 0;

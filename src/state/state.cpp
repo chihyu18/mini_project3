@@ -15,7 +15,7 @@
  */
 
 //self-added
-int piece_val[7]={0, 10, 30, 40, 50, 100, 10000};
+int piece_val[7]={0, 10, 30, 40, 50, 100, 1000};
 
 /**
  * @brief return next state after the move
@@ -165,7 +165,7 @@ int State::eval(int p){
     }
   }
   
-  value=material_val*10+check_val*1000+movability_val*100; //挖這可能真的是最好的權重了 改了會invalid action是怎樣？？？
+  value=material_val*10+check_val*1000+movability_val*10; //material_val*10+check_val*1000+movability_val*100; 
   return value;
 }
 

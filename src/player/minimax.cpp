@@ -41,9 +41,10 @@ void read_board(std::ifstream& fin) {
 void write_valid_spot(std::ofstream& fout) { 
   //todo?
   // Keep updating the output until getting killed.
+  int depth=1;
   while(true) { //root->game_state==UNKNOWN || root->game_state==NONE
     // Choose a random spot.
-    auto move = Minimax::get_move(root, 4); //超過四層就出事...
+    auto move = Minimax::get_move(root, depth++); //超過四層就出事...
     fout << move.first.first << " " << move.first.second << " "\
          << move.second.first << " " << move.second.second << std::endl;  
     // Remember to flush the output to ensure the last action is written to file.

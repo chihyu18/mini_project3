@@ -48,19 +48,19 @@ Move MCTS::get_move(State *state, int depth){
 	Node best_subnode;
 	Node *root=new Node(*state);
 	root->N=1;
-	/*auto actions=state->legal_actions;
+	auto actions=state->legal_actions;
 	for(auto act:actions){
 		Node child=Node(*state);
 		// child.N=1;
 		child.act=act;
-		child.parent=&root;
+		child.parent=root;
 		child.game_state=*(child.game_state.next_state(act)); //be careful?
-		root.children.push_back(child);
-	}*/
+		root->children.push_back(child);
+	}
 	best_subnode=MCts(root);
 
-	auto tmp=root->game_state.legal_actions;
-  return tmp[rand()%tmp.size()]; //best_subnode.act; //tmp[rand()%tmp.size()];
+	// auto tmp=root->game_state.legal_actions;
+  return best_subnode.act; //best_subnode.act; //tmp[rand()%tmp.size()];
 }
 
 Node MCts(Node* root){
