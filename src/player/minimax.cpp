@@ -42,7 +42,7 @@ void write_valid_spot(std::ofstream& fout) {
   //todo?
   // Keep updating the output until getting killed.
   int depth=3;
-  while(true) { //root->game_state==UNKNOWN || root->game_state==NONE
+  while(true) {
     // Choose a random spot.
     auto move = Minimax::get_move(root, depth++); //超過四層就出事...
     fout << move.first.first << " " << move.first.second << " "\

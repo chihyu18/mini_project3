@@ -76,11 +76,17 @@ static const int move_table_king[8][2] = {
   {1, 1}, {1, -1}, {-1, 1}, {-1, -1},
 };
 
+bool check_valid(int x, int y){
+  if(x<0 || x>=BOARD_H || y<0 || y>=BOARD_W) return false;
+  return true;
+}
+
 int State::eval(int p){
   int value=0;
-  // int now_piece;
+  int king_threat=0;
+  int nx, ny;
   auto& self_board=board.board[p];
-  // auto& oppn_board=board.board[!p];
+  auto& oppn_board=board.board[!p];
   for(int i=0;i<BOARD_H;++i){
     for(int j=0;j<BOARD_W;++j){
       value+=piece_val[self_board[i][j]];
@@ -102,13 +108,37 @@ int State::eval(int p){
           break;
         case 6:
           value+=piece_val[6]+king_Square_Table2[i][j];
+          for(int k=0;k<8;++k){
+            nx=i+move_table_knight[k][0];
+            ny=j+move_table_knight[k][1];
+            if(!check_valid(nx, ny) || self_board[nx][ny]) continue;
+            if(oppn_board[nx][ny]==3) king_threat++;
+          }
+          for(int path=0;path<4;++path){
+            for(int k=0;k<7;++k){
+              nx=i+move_table_rook_bishop[path][k][0];
+              ny=j+move_table_rook_bishop[path][k][1];
+              if(!check_valid(nx, ny) || self_board[nx][ny]) continue;
+              if(oppn_board[nx][ny]==2 || oppn_board[nx][ny]==5) king_threat++;
+              else break; //the attack can be blocked
+            }
+          }
+          for(int path=4;path<8;++path){
+            for(int k=0;k<7;++k){
+              nx=i+move_table_rook_bishop[path][k][0];
+              ny=j+move_table_rook_bishop[path][k][1];
+              if(!check_valid(nx, ny) || self_board[nx][ny]) continue;
+              if(oppn_board[nx][ny]==4 || oppn_board[nx][ny]==5) king_threat++;
+              else break;
+            }
+          }
           break;
         default:
           break;
       }
     }
   }
-  return value;
+  return value-king_threat*90; //causing threats is just like losing queens(?
 }
 
 /*int State::eval(int p){
