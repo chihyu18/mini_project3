@@ -13,22 +13,13 @@ by dfs?
 #include "../state/state.hpp"
 #include "./minimax.hpp"
 
-
-/**
- * @brief Randomly get a legal action
- * 
- * @param state Now state
- * @param depth You may need this for other policy
- * @return Move 
- */
 Move Minimax::get_move(State *state, int depth){
   if(!state->legal_actions.size()) //no legal actions
     state->get_legal_actions();
   
   auto actions = state->legal_actions;
 
-  //self-added
-	
+  //self-added	
 	Move ans=actions[0];
 	if(state->player==0){
 		int max=INT_MIN;
@@ -37,13 +28,11 @@ Move Minimax::get_move(State *state, int depth){
 			next=state->next_state(act);
 
 			int value=minimax(next, depth, !state->player, 0);
-			// next.evaluate();
 			if(next->value>max){
 				max=next->value;
 				ans=act;
 			}
 			delete(next);
-			// max=std::max(max, minimax(&next, depth, !state->player, 0)); //next level would be oppn...?
 		}
 	}
 	else{
@@ -53,17 +42,13 @@ Move Minimax::get_move(State *state, int depth){
 			next=state->next_state(act);
 
 			int value=minimax(next, depth, !state->player, 0);
-			// next.evaluate();
 			if(value<min){
 				min=value;
 				ans=act;
 			}
 			delete(next);
-			// max=std::max(max, minimax(&next, depth, !state->player, 0)); //next level would be oppn...?
 		}
 	}
-	
-
   return ans;
 }
 

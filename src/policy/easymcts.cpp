@@ -20,7 +20,7 @@ Move EASYMCTS::get_move(State *state, int depth){
 	srand(time(0));
 
   easyNode root=easyNode(state);
-  int computation_budget=1000;
+  int computation_budget=2000;
   auto& actions=state->legal_actions;
   int max=INT_MIN;
   Move best_act;
@@ -31,29 +31,13 @@ Move EASYMCTS::get_move(State *state, int depth){
       child.act=act;
       root.children.push_back(child);
   }
-  for(int i=0;i<computation_budget;++i){
-    /*easyNode expand_node;
-    for(auto child:root.children){
-      int max=INT_MIN;
-      double left, right;
-      double C=1/sqrt(2);
-      left=child.Q/child.N+1e-9;
-      right=C*sqrt(2*log(root.N+1e-6)/child.N+1e-9);
-      if(left+right>max){
-          max=left+right;
-          expand_node=child;
-      }
-    }*/
-    easyNode* expand_node=&(root.children[rand()%root.children.size()]); //=BestChild(&root);
-    int reward=Rollout(expand_node);
-    expand_node->Q+=reward;
-    expand_node->N++;
-    root.N++;
-    // if(expand_node.Q>max){
-    //   max=expand_node.Q;
-    //   best_act=expand_node.act;
-    // }
+  for(auto& child:root.children){
+    for(int i=0;i<computation_budget;++i){ 
+      int reward=Rollout(&child);
+      child.Q+=reward;
+    }
   }
+  
   for(auto& child:root.children){
     if(child.Q>max){
       max=child.Q;
@@ -61,8 +45,6 @@ Move EASYMCTS::get_move(State *state, int depth){
     }
   }
   return best_act;
-  // easyNode* best_node=BestChild(&root);
-  // return best_node->act;
 }
 
 easyNode BestChild(easyNode* root){

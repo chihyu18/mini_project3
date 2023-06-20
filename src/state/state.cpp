@@ -17,9 +17,9 @@
 //self-added
 //reference: https://rustic-chess.org/evaluation/material.html
 //pawn rook knight bishop queen king /rank
-int piece_val[7]={0, 10, 50, 30, 30, 90, 1000}; //1
+// int piece_val[7]={0, 10, 50, 30, 30, 90, 1000}; //1
 // int piece_val[7]={0, 1, 5, 3, 3, 9, 100}; //2
-// int piece_val[7]={0, 100, 500, 300, 300, 900, 20000}; //not good
+int piece_val[7]={0, 100, 500, 300, 300, 900, 10000}; //not good
 
 /**
  * @brief return next state after the move
@@ -138,7 +138,7 @@ int State::eval(int p){
       }
     }
   }
-  return value-king_threat*90; //causing threats is just like losing queens(?
+  return value-king_threat*900; //causing threats is just like losing queens(?
 }
 
 int State::evaluate(){ //eval from p's perspective
