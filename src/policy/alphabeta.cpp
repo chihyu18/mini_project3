@@ -34,11 +34,7 @@ Move Alphabeta::get_move(State *state, int depth){
     int max=INT_MIN;   
     for(auto& act:actions){  
       State* next=state->next_state(act);
-      // next->alpha=state->alpha;
-      // next->alpha=INT_MIN;
-      // next->beta=INT_MAX;
       int value=alphabeta(next, depth, !state->player, 0);
-      // state->alpha=std::max(state->alpha, alphabeta(next, depth, state->player, 0));
       if(value>max){
         max=value;
         ans=act;
@@ -50,11 +46,7 @@ Move Alphabeta::get_move(State *state, int depth){
     int min=INT_MAX;
     for(auto& act:actions){  
       State* next=state->next_state(act);
-      // next->alpha=state->alpha;
-      // next->alpha=INT_MIN;
-      // next->beta=INT_MAX;
       int value=alphabeta(next, depth, !state->player, 0);
-      // state->alpha=std::max(state->alpha, alphabeta(next, depth, state->player, 0));
       if(value<min){
         min=value;
         ans=act;
@@ -67,7 +59,8 @@ Move Alphabeta::get_move(State *state, int depth){
 }
 
 int alphabeta(State *state, int depth, int p, int d){
-    //since oppn must choose the min, but the last level(player) will choose the max, hence any smaller than that min is unnecessary
+    //since oppn must choose the min, but the last level(player) will choose the max, 
+    // hence any smaller than that min is unnecessary
     //so for player, those alpha>=beta are redundant; while for oppn, those beta<=alpha are redundant
     //OMG the conditions are the same!!!
     if(d==depth) 
@@ -87,7 +80,6 @@ int alphabeta(State *state, int depth, int p, int d){
         int v=alphabeta(next, depth, !p, d+1);
         min=std::min(min, v);
         state->beta=min;
-        // min=state->beta=std::min(state->beta, alphabeta(next, depth, p, d+1));
         
         delete(next);
         if(state->alpha>=state->beta) break;
@@ -105,7 +97,6 @@ int alphabeta(State *state, int depth, int p, int d){
         int v=alphabeta(next, depth, !p, d+1);
         max=std::max(max, v);
         state->alpha=max;
-        // max=state->alpha=std::max(state->alpha, alphabeta(next, depth, p, d+1));
         delete(next);
         if(state->alpha>=state->beta) break;
       }

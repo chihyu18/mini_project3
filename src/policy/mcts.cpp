@@ -25,6 +25,7 @@ build tree is for propagating to the root?
 
 const int material_table[7] = {0, 2, 6, 7, 8, 20, 100};
 
+/*v2
 Node MCts(Node* root);
 double get_UCB(Node* node);
 Node selection(Node* node);
@@ -32,13 +33,6 @@ Node Expansion(Node* node);
 int roll_out(Node* node, int p, int cnt);
 void backup(Node* node, int reward);
 
-/**
- * @brief Randomly get a legal action
- * 
- * @param state Now state
- * @param depth You may need this for other policy
- * @return Move 
- */
 Move MCTS::get_move(State *state, int depth){
   if(!state->legal_actions.size())
     state->get_legal_actions();
@@ -161,14 +155,14 @@ int roll_out(Node* node, int p, int cnt){
 	State* next_state=node->game_state.next_state(simulate_act);
 	Node simulate_node=Node(*next_state);
 	
-	/*node->game_state.get_legal_actions();
-	auto& actions=node->game_state.legal_actions;
-	for(auto& act:actions){
-		State* next_state=node->game_state.next_state(act);
-		Node child=Node(*next_state);
-		node->children.push_back(child);
-	}
-	Node simulate_node=node->children[rand()%node->children.size()];*/
+	// node->game_state.get_legal_actions();
+	// auto& actions=node->game_state.legal_actions;
+	// for(auto& act:actions){
+	// 	State* next_state=node->game_state.next_state(act);
+	// 	Node child=Node(*next_state);
+	// 	node->children.push_back(child);
+	// }
+	// Node simulate_node=node->children[rand()%node->children.size()];
 
 	return roll_out(&simulate_node, p, cnt+1);
 }
@@ -179,9 +173,33 @@ void backup(Node* node, int reward){
 		node->N++;
 		node=node->parent;
 	}
+}*/
+
+Move MCTS::get_move(State *state, int depth){
+  if(!state->legal_actions.size())
+    state->get_legal_actions();
+
+	srand(time(0));
+
+	Node best_subnode;
+	Node *root=new Node(*state);
+	root->N=1;
+	auto actions=state->legal_actions;
+	for(auto act:actions){
+		Node child=Node(*state);
+		// child.N=1;
+		child.act=act;
+		child.parent=root;
+		child.game_state=*(child.game_state.next_state(act)); //be careful?
+		root->children.push_back(child);
+	}
+	best_subnode=MCts(root);
+
+	// auto tmp=root->game_state.legal_actions;
+  return best_subnode.act; //best_subnode.act; //tmp[rand()%tmp.size()];
 }
 
-/*Node MCTS::MCts(Node* root){
+Node MCTS::MCts(Node* root){
 	int computation_budget=1000; //limit the times of searching
 	Node select_node;
 	int reward=0;
@@ -319,4 +337,4 @@ void MCTS::BackUp(Node* node, int reward){
 		node->Q+=reward;
 		node=node->parent;
 	}
-}*/
+}

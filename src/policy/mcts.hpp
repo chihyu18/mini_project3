@@ -13,10 +13,10 @@ public:
 
   static double get_UCB(Node* node);
 
-  /*static Node MCts(Node* root);
+  static Node MCts(Node* root);
   static Node TreePolicy(Node* node); //selection
   static Node BestChild(Node* node, bool is_explore);
   static Node Expand(Node* node);  //for expansion
   static int DefaultPolicy(Node* node); //for simulation
-  static void BackUp(Node* node, int reward); //for propagation*/
+  static void BackUp(Node* node, int reward); //for propagation
 };

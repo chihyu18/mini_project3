@@ -118,18 +118,18 @@ int State::eval(int p){
             for(int k=0;k<7;++k){
               nx=i+move_table_rook_bishop[path][k][0];
               ny=j+move_table_rook_bishop[path][k][1];
-              if(!check_valid(nx, ny) || self_board[nx][ny]) continue;
+              if(!check_valid(nx, ny) || self_board[nx][ny]) break;
               if(oppn_board[nx][ny]==2 || oppn_board[nx][ny]==5) king_threat++;
-              else break; //the attack can be blocked
+              else if(oppn_board[nx][ny])  break; //the attack can be blocked
             }
           }
           for(int path=4;path<8;++path){
             for(int k=0;k<7;++k){
               nx=i+move_table_rook_bishop[path][k][0];
               ny=j+move_table_rook_bishop[path][k][1];
-              if(!check_valid(nx, ny) || self_board[nx][ny]) continue;
+              if(!check_valid(nx, ny) || self_board[nx][ny]) break;
               if(oppn_board[nx][ny]==4 || oppn_board[nx][ny]==5) king_threat++;
-              else break;
+              else if(oppn_board[nx][ny]) break;
             }
           }
           break;
@@ -140,140 +140,6 @@ int State::eval(int p){
   }
   return value-king_threat*90; //causing threats is just like losing queens(?
 }
-
-/*int State::eval(int p){
-  //improved: should let the effect of taking piece bigger than the walkable paths...
-  //to improve: maybe consider king's safety
-  //improved: don't consider the potential of taking material!! since that's the next round's business:(
-
-  if(game_state==WIN && player!=p) return -100000; //the worst senario!!(因為在get_legal_actions的時候就會判斷WIN了，所以這樣可以?)
-  if(game_state==WIN) return 100000;
-
-  auto self_board=board.board[p], oppn_board=board.board[!p];
-  int material_val=0, movability_val=0, check_val=0, king_threat=0;
-  int value=0;
-  int now_piece;
-  int nx, ny, walkable=0, k;
-  for(int i=0;i<BOARD_H;++i){
-    for(int j=0;j<BOARD_W;++j){
-      walkable=0;
-      switch(now_piece=self_board[i][j]){
-        case 1: //pawn-10
-          if(!p && i>0){ //white
-            material_val+=piece_val[1];
-            if(!self_board[i-1][j] && !oppn_board[i-1][j]) walkable++;
-            if(j>0 && oppn_board[i-1][j-1]!=now_piece){
-              if(oppn_board[i-1][j+1]==6) check_val++;
-              walkable++;
-            }
-            if(j<BOARD_W-1 && oppn_board[i-1][j+1]!=now_piece) {
-              if(oppn_board[i-1][j+1]==6) 
-                check_val++; 
-                walkable++;
-            }
-          }
-          else if(p && i<BOARD_H-1){ //black
-            material_val+=piece_val[1];
-            if(!self_board[i+1][j] && !oppn_board[i+1][j]) walkable++;
-            if(j>0 && oppn_board[i+1][j-1]!=now_piece){
-              if(oppn_board[i+1][j+1]==6) check_val++;
-              walkable++;
-            }
-            if(j<BOARD_W-1 && oppn_board[i+1][j+1]!=now_piece) {
-              if(oppn_board[i+1][j+1]==6) check_val++; 
-              walkable++;
-            }
-          }
-          movability_val+=walkable;
-          break;
-        case 2: //rook-30
-        case 4: //bishop-40
-        case 5: //queen-100
-          int st, end, val;
-          switch(now_piece){
-            case 2: st=0; end=4; material_val+=piece_val[2]; break; //rook
-            case 4: st=4; end=8; material_val+=piece_val[4]; break; //bishop
-            case 5: st=0; end=8; material_val+=piece_val[5]; break; //queen
-            default: st=0; end=-1;
-          }
-          for(int path=st;path<end;++path){
-            for(k=0;k<7;++k){
-              nx=i+move_table_rook_bishop[path][k][0];
-              ny=j+move_table_rook_bishop[path][k][1];
-              if(nx<0 || nx>=BOARD_H || ny<0 || ny>=BOARD_W) break;
-              if(self_board[nx][ny]) break;
-              if(oppn_board[nx][ny]!=now_piece){
-                if(oppn_board[nx][ny]==6) check_val++;
-                break;
-              }                            
-            }
-            walkable+=k;
-          }
-          movability_val+=walkable;
-          break;
-        case 3: //knight-35
-          for(k=0;k<8;++k){
-            nx=i+move_table_knight[k][0];
-            ny=j+move_table_knight[k][1];
-            if(nx<0 || nx>=BOARD_H || ny<0 || ny>=BOARD_W) continue;
-            if(self_board[nx][ny]) continue;
-            if(oppn_board[nx][ny]!=now_piece){
-              if(oppn_board[nx][ny]==6) check_val++;
-              walkable++;
-            } 
-          }
-          material_val+=piece_val[3];
-          movability_val+=walkable;
-          break;
-        case 6: //king-INF
-        //maybe i need to consider check...
-          // king's safety
-          for(k=0;k<8;++k){
-            nx=i+move_table_king[k][0];
-            ny=j+move_table_king[k][1];
-            if(nx<0 || nx>=BOARD_H || ny<0 || ny>=BOARD_W) continue;
-            if(self_board[nx][ny]) continue;
-            if(oppn_board[nx][ny]==6) king_threat++;
-            walkable++;
-          }
-          for(int path=0;path<4;++path){
-            for(k=0;k<7;++k){
-              nx=i+move_table_rook_bishop[path][k][0];
-              ny=j+move_table_rook_bishop[path][k][1];
-              if(nx<0 || nx>=BOARD_H || ny<0 || ny>=BOARD_W) continue;
-              if(self_board[nx][ny]) continue;
-              if(oppn_board[nx][ny]==2 || oppn_board[nx][ny]==5) king_threat++;
-            }
-          }
-          for(int path=4;path<8;++path){
-            for(k=0;k<7;++k){
-              nx=i+move_table_rook_bishop[path][k][0];
-              ny=j+move_table_rook_bishop[path][k][1];
-              if(nx<0 || nx>=BOARD_H || ny<0 || ny>=BOARD_W) continue;
-              if(self_board[nx][ny]) continue;
-              if(oppn_board[nx][ny]==4 || oppn_board[nx][ny]==5) king_threat++;
-            }
-          }
-          for(k=0;k<8;++k){
-            nx=i+move_table_knight[k][0];
-            ny=j+move_table_knight[k][1];
-            if(nx<0 || nx>=BOARD_H || ny<0 || ny>=BOARD_W) continue;
-            if(self_board[nx][ny]) continue;
-            if(oppn_board[nx][ny]==3) king_threat++;
-          }
-          material_val+=piece_val[6];
-          movability_val+=walkable; //we don't want too many open path for king...?
-          break;
-        default:
-          break;
-      }
-    }
-  }
-  
-  value=material_val-king_threat*100+check_val*50+movability_val*10; 
-  //+check_val*1000+movability_val*10-king_threat*10000; //material_val*10+check_val*1000+movability_val*100; 
-  return value;
-}*/
 
 int State::evaluate(){ //eval from p's perspective
   // [TODO] design your own evaluation function
