@@ -10,7 +10,8 @@
 
 const int material_table[7] = {0, 2, 6, 7, 8, 20, 100};
 
-easyNode BestChild(easyNode* root);
+//it seems that BestChilds causes error
+// easyNode BestChild(easyNode* root); 
 int Rollout(easyNode* node);
 
 Move EASYMCTS::get_move(State *state, int depth){
@@ -45,23 +46,6 @@ Move EASYMCTS::get_move(State *state, int depth){
     }
   }
   return best_act;
-}
-
-easyNode BestChild(easyNode* root){
-    auto& children=root->children;
-    int max=INT_MIN;
-    double left, right;
-    double C=1/sqrt(2);
-    easyNode best_node;
-    for(auto& child: children){
-        left=child.Q/child.N+1e-6;
-        right=C*sqrt(2*log(root->N+1e-6)/child.N+1e-9);
-        if(left+right>max){
-            max=left+right;
-            best_node=child;
-        }
-    }
-    return best_node;
 }
 
 int Rollout(easyNode* node){
@@ -111,3 +95,20 @@ int Rollout(easyNode* node){
 	else reward=1;
 	return reward;
 }
+
+/*easyNode BestChild(easyNode* root){
+    auto& children=root->children;
+    int max=INT_MIN;
+    double left, right;
+    double C=1/sqrt(2);
+    easyNode best_node;
+    for(auto& child: children){
+        left=child.Q/child.N+1e-6;
+        right=C*sqrt(2*log(root->N+1e-6)/child.N+1e-9);
+        if(left+right>max){
+            max=left+right;
+            best_node=child;
+        }
+    }
+    return best_node;
+}*/

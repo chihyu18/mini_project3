@@ -19,7 +19,7 @@
 //pawn rook knight bishop queen king /rank
 // int piece_val[7]={0, 10, 50, 30, 30, 90, 1000}; //1
 // int piece_val[7]={0, 1, 5, 3, 3, 9, 100}; //2
-int piece_val[7]={0, 100, 500, 300, 300, 900, 10000}; //not good
+int piece_val[7]={0, 100, 500, 300, 300, 900, 10000}; //choose...
 
 /**
  * @brief return next state after the move
@@ -156,16 +156,9 @@ int State::evaluate(){ //eval from p's perspective
   if(game_state==WIN) return 100000;
   int white_val=eval(0);
   int black_val=eval(1);
-  // int my_val=eval(p);
-  // int oppn_val=eval(!p);
   return value=white_val-black_val;
 }
 
-
-/**
- * @brief get all legal actions of now state
- * 
- */
 void State::get_legal_actions(){
   // [Optional]
   // This method is not very efficient
@@ -243,7 +236,7 @@ void State::get_legal_actions(){
                 if(p[0]>=BOARD_H || p[0]<0 || p[1]>=BOARD_W || p[1]<0) break;
                 now_piece = self_board[p[0]][p[1]];
                 if(now_piece) break; 
-                //if want to combine the state-value func, maybe here(but it didn't care about whose piece is it)
+                //if want to combine the state-value func, maybe here(but it doesn't care about whose piece is it)
                 
                 all_actions.push_back(Move(Point(i, j), Point(p[0], p[1])));
                 
