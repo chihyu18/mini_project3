@@ -1,1 +1,1 @@
-getmove 0
+getmove 1

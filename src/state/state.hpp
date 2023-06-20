@@ -78,12 +78,21 @@ const int bishop_Square_Table[5][5]={
   {0,   0,   0,   0,    0}
 };
 
-const int rook_Square_Table[5][5]={
-  {0,   0,   5,   5,   0},
-  {0,   0,   5,   5,   0},
-  {0,   0,   5,   5,   0},
-  {0,   0,   5,   5,   0},
-  {0,   0,   5,   5,   0}
+const int rook_Square_Table[2][5][5]={
+  {
+    {0,   5,   5,   0,   0},
+    {0,   5,   5,   0,   0},
+    {0,   5,   5,   0,   0},
+    {0,   5,   5,   0,   0},
+    {0,   5,   5,   0,   0}
+  },
+  {
+    {0,   0,   5,   5,   0},
+    {0,   0,   5,   5,   0},
+    {0,   0,   5,   5,   0},
+    {0,   0,   5,   5,   0},
+    {0,   0,   5,   5,   0}
+  }
 };
 
 const int queen_Square_Table[5][5]={
@@ -148,7 +157,7 @@ class State{
     // State(State& s): board(s.board), player(s.player), alpha(s.alpha), beta(s.beta), game_state(s.game_state){};
     int eval(int p);
 
-    int evaluate(int p);
+    int evaluate();
     State* next_state(Move move);
     void get_legal_actions();
     std::string encode_output();

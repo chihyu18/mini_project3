@@ -16,9 +16,9 @@
 
 //self-added
 //pawn rook knight bishop queen king
-// int piece_val[7]={0, 10, 50, 30, 30, 100, 1000};
-// int piece_val[7]={0, 1, 5, 3, 3, 9, 100};
-int piece_val[7]={0, 100, 500, 300, 300, 900, 20000};
+// int piece_val[7]={0, 10, 50, 30, 30, 100, 1000}; //not good
+int piece_val[7]={0, 1, 5, 3, 3, 9, 100}; //ok?
+// int piece_val[7]={0, 100, 500, 300, 300, 900, 20000}; //not good
 
 /**
  * @brief return next state after the move
@@ -77,17 +77,18 @@ static const int move_table_king[8][2] = {
 
 int State::eval(int p){
   int value=0;
-  int now_piece;
+  // int now_piece;
   auto& self_board=board.board[p];
+  // auto& oppn_board=board.board[!p];
   for(int i=0;i<BOARD_H;++i){
     for(int j=0;j<BOARD_W;++j){
       value+=piece_val[self_board[i][j]];
-      /*switch(now_piece=self_board[i][j]){
+      switch(self_board[i][j]){
         case 1:
           value+=piece_val[1]+pawn_Square_Table[p][i][j];
           break;
         case 2:
-          value+=piece_val[2]+rook_Square_Table[i][j];
+          value+=piece_val[2]+rook_Square_Table[p][i][j];
           break;
         case 3:
           value+=piece_val[3]+knight_Square_Table[i][j];
@@ -103,7 +104,7 @@ int State::eval(int p){
           break;
         default:
           break;
-      }*/
+      }
     }
   }
   return value;
@@ -243,7 +244,7 @@ int State::eval(int p){
   return value;
 }*/
 
-int State::evaluate(int p){ //eval from p's perspective
+int State::evaluate(){ //eval from p's perspective
   // [TODO] design your own evaluation function
   /*
   evaluate the present state?
@@ -254,10 +255,13 @@ int State::evaluate(int p){ //eval from p's perspective
   val of each pieces: val*num_of_walkable_path + val_of_oppn_pieces_can_be_eaten?
   */
  //optimize: maybe use a map to record the pos of pieces?
-
-  int my_val=eval(p);
-  int oppn_val=eval(!p);
-  return value=my_val-oppn_val;
+  if(game_state==WIN && player==1) return -100000;
+  if(game_state==WIN) return 100000;
+  int white_val=eval(0);
+  int black_val=eval(1);
+  // int my_val=eval(p);
+  // int oppn_val=eval(!p);
+  return value=white_val-black_val;
 }
 
 

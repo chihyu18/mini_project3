@@ -302,6 +302,7 @@ std::string State::encode_output(){
   for(int i=0; i<BOARD_H; i+=1){
     for(int j=0; j<BOARD_W; j+=1){
       ss << "│ ";
+      //combine the two board?
       if((now_piece = this->board.board[0][i][j])){
         ss << std::string(PIECE_TABLE[0][now_piece]) << " ";
       }else if((now_piece = this->board.board[1][i][j])){

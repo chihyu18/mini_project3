@@ -28,22 +28,40 @@ Move Alphabeta::get_move(State *state, int depth){
   //reset...?
   state->alpha=INT_MIN;
   state->beta=INT_MAX;
-  int max=INT_MIN;
-
   Move ans=actions[0];
-  for(auto& act:actions){  
 
-    State* next=state->next_state(act);
-    // next->alpha=state->alpha;
-    // next->alpha=INT_MIN;
-    // next->beta=INT_MAX;
-    alphabeta(next, depth, state->player, 0);
-    // state->alpha=std::max(state->alpha, alphabeta(next, depth, state->player, 0));
-		if(next->value>max){
-			max=next->value;
-			ans=act;
-		}
+  if(state->player==0){
+    int max=INT_MIN;   
+    for(auto& act:actions){  
+      State* next=state->next_state(act);
+      // next->alpha=state->alpha;
+      // next->alpha=INT_MIN;
+      // next->beta=INT_MAX;
+      int value=alphabeta(next, depth, !state->player, 0);
+      // state->alpha=std::max(state->alpha, alphabeta(next, depth, state->player, 0));
+      if(value>max){
+        max=value;
+        ans=act;
+      }
+      delete(next);
+    }
   }
+  else{
+    int min=INT_MAX;
+    for(auto& act:actions){  
+      State* next=state->next_state(act);
+      // next->alpha=state->alpha;
+      // next->alpha=INT_MIN;
+      // next->beta=INT_MAX;
+      int value=alphabeta(next, depth, !state->player, 0);
+      // state->alpha=std::max(state->alpha, alphabeta(next, depth, state->player, 0));
+      if(value<min){
+        min=value;
+        ans=act;
+      }
+    }
+  }
+  
 
   return ans;
 }
@@ -53,12 +71,12 @@ int alphabeta(State *state, int depth, int p, int d){
     //so for player, those alpha>=beta are redundant; while for oppn, those beta<=alpha are redundant
     //OMG the conditions are the same!!!
     if(d==depth) 
-      return state->evaluate(p);
+      return state->evaluate();
 
     state->get_legal_actions();
     auto actions=state->legal_actions;
 
-    if(state->player!=p){ //oppn
+    if(p==1){ //for black
       int min=INT_MAX;
       for(auto& act:actions){
 
@@ -66,12 +84,17 @@ int alphabeta(State *state, int depth, int p, int d){
         next->alpha=state->alpha;
         next->beta=state->beta;
 
-        min=state->beta=std::min(state->beta, alphabeta(next, depth, p, d+1));
+        int v=alphabeta(next, depth, !p, d+1);
+        min=std::min(min, v);
+        state->beta=min;
+        // min=state->beta=std::min(state->beta, alphabeta(next, depth, p, d+1));
+        
+        delete(next);
         if(state->alpha>=state->beta) break;
       }
       return state->value=min;
     }
-    else{ //me
+    else{ //for white
       int max=INT_MIN;
       for(auto& act:actions){
 
@@ -79,7 +102,11 @@ int alphabeta(State *state, int depth, int p, int d){
         next->alpha=state->alpha;
         next->beta=state->beta;
 
-        max=state->alpha=std::max(state->alpha, alphabeta(next, depth, p, d+1));
+        int v=alphabeta(next, depth, !p, d+1);
+        max=std::max(max, v);
+        state->alpha=max;
+        // max=state->alpha=std::max(state->alpha, alphabeta(next, depth, p, d+1));
+        delete(next);
         if(state->alpha>=state->beta) break;
       }
       return state->value=max;
