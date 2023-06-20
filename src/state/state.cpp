@@ -15,9 +15,10 @@
  */
 
 //self-added
-//pawn rook knight bishop queen king
-// int piece_val[7]={0, 10, 50, 30, 30, 100, 1000}; //not good
-int piece_val[7]={0, 1, 5, 3, 3, 9, 100}; //ok?
+//reference: https://rustic-chess.org/evaluation/material.html
+//pawn rook knight bishop queen king /rank
+int piece_val[7]={0, 10, 50, 30, 30, 90, 1000}; //1
+// int piece_val[7]={0, 1, 5, 3, 3, 9, 100}; //2
 // int piece_val[7]={0, 100, 500, 300, 300, 900, 20000}; //not good
 
 /**
@@ -100,7 +101,7 @@ int State::eval(int p){
           value+=piece_val[5]+queen_Square_Table[i][j];
           break;
         case 6:
-          value+=piece_val[6]+king_Square_Table1[p][i][j];
+          value+=piece_val[6]+king_Square_Table2[i][j];
           break;
         default:
           break;
