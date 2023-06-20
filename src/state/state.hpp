@@ -143,7 +143,7 @@ class State{
     int value;
     int alpha=INT_MIN; //the max the player can get
     int beta=INT_MAX; //the min the oppn can get
-    int step=0; //record how many steps have been walked
+    // int step=0; //record how many steps have been walked
 
     // std::multiset<std::pair<Piece, Point>> self_pieces, oppn_pieces;
     // std::map<Point, Piece> self_pieces, oppn_pieces;
@@ -163,6 +163,18 @@ class State{
     void get_legal_actions();
     std::string encode_output();
     std::string encode_state();
+};
+
+//self-added for easy mcts
+class easyNode{
+public:
+  int Q=0;
+  int N=0;
+  Move act;
+  std::vector<easyNode> children;
+  State state;
+  easyNode(){};
+  easyNode(State* s):state(*s){};
 };
 
 //self-added for mcts

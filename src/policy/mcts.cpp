@@ -187,6 +187,7 @@ Move MCTS::get_move(State *state, int depth){
 	auto actions=state->legal_actions;
 	for(auto act:actions){
 		Node child=Node(*state);
+		// best_subnode=child;
 		// child.N=1;
 		child.act=act;
 		child.parent=root;
@@ -195,15 +196,14 @@ Move MCTS::get_move(State *state, int depth){
 	}
 	best_subnode=MCts(root);
 
-	// auto tmp=root->game_state.legal_actions;
-  return best_subnode.act; //best_subnode.act; //tmp[rand()%tmp.size()];
+	// auto tmp=root->children;
+  return best_subnode.act; //best_subnode.act; //tmp[rand()%tmp.size()]; //tmp[rand()%tmp.size()].act;
 }
 
 Node MCTS::MCts(Node* root){
 	int computation_budget=1000; //limit the times of searching
 	Node select_node;
 	int reward=0;
-	srand(time(0));
   for(int i=0;i<computation_budget;++i){
 		select_node=TreePolicy(root); //select
 		reward=DefaultPolicy(&select_node); //simulate
